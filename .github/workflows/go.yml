@@ -1,0 +1,54 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '.github/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.go'
+      - '.github/**'
+env:
+  ACTIVE_PROFILE: prod
+jobs:
+  test-build:
+    name: Test and Build
+    strategy:
+      matrix:
+        go-version: [1.18.x, 1.19.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Setup env
+      run: |
+        echo "----> Active Profile = $ACTIVE_PROFILE"
+        echo "::set-env name=GOPATH::$(go env GOPATH)"
+        echo "::add-path::$(go env GOPATH)/bin"
+      shell: bash
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      # with:
+      #   fetch-depth: 1
+      #   path: ./src/github.com/${{ github.repository }}
+
+    - name: Get dependencies
+      run: |
+        go mod download
+        go mod tidy
+        go get -v -t -d ./...
+
+    - name: Test
+      run: go test -v ./...
+
+    - name: Build
+      run: go build -v .

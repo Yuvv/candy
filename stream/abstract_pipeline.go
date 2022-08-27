@@ -1,9 +1,9 @@
 package stream
 
 import (
-	"github.com/yuvv/jog/lang"
-	"github.com/yuvv/jog/util"
-	"github.com/yuvv/jog/util/function"
+	"github.com/yuvv/candy/function"
+	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/lang"
 )
 
 type PipelineHelper[POUT any] interface {
@@ -11,7 +11,8 @@ type PipelineHelper[POUT any] interface {
 
 	GetStreamAndOpFlags() int
 
-	ExactOutputSizeIfKnown[PIN](spliterator util.Spliterator[PIN])
+	// todo: @yuvv
+	//ExactOutputSizeIfKnown[PIN any](spliterator iters.Spliterator[PIN])
 
 	// todo: others
 }
@@ -34,9 +35,9 @@ type _AbstractPipeline[EIN, EOUT any, S BaseStream[EOUT, S]] struct {
 
 	combinedFlags int
 
-	sourceSpliterator util.Spliterator[any]
+	sourceSpliterator iters.Spliterator[any]
 
-	sourceSupplier function.Supplier[util.Spliterator[any]]
+	sourceSupplier function.Supplier[iters.Spliterator[any]]
 
 	sourceCloseAction lang.Runnable
 

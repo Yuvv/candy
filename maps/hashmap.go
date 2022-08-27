@@ -2,9 +2,9 @@ package maps
 
 import (
 	"github.com/yuvv/candy/collections"
+	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/lists"
 	"github.com/yuvv/candy/sets"
-	"github.com/yuvv/candy/util/function"
 )
 
 type HashMap[K comparable, V any] struct {

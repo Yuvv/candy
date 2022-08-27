@@ -2,8 +2,9 @@ package sets
 
 import (
 	"github.com/yuvv/candy/collections"
-	"github.com/yuvv/candy/util"
-	"github.com/yuvv/candy/util/function"
+	"github.com/yuvv/candy/function"
+	"github.com/yuvv/candy/iters"
+	"reflect"
 )
 
 type HashSet[E comparable] struct {
@@ -16,7 +17,7 @@ type hashsetIter struct {
 	// todo:
 }
 
-func (h *HashSet[E]) Iterator() util.Iterator[E] {
+func (h *HashSet[E]) Iterator() iters.Iterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -27,7 +28,7 @@ func (h *HashSet[E]) ForEach(action function.Consumer[E]) {
 	}
 }
 
-func (h *HashSet[E]) Spliterator() util.Spliterator[E] {
+func (h *HashSet[E]) Spliterator() iters.Spliterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -37,6 +38,10 @@ func (h *HashSet[E]) Size() int {
 }
 
 func (h *HashSet[E]) Contains(o any) bool {
+	oType := reflect.TypeOf(o)
+	if !oType.Comparable() {
+		return false
+	}
 	_, ok := h.set[o]
 	return ok
 }
@@ -57,7 +62,7 @@ func (h *HashSet[E]) Add(e E) bool {
 }
 
 // Remove Returns true if the set contained the specified element
-func (h *HashSet[E]) Remove(o any) bool {
+func (h *HashSet[E]) Remove(o E) bool {
 	_, ok := h.set[o]
 	if ok {
 		delete(h.set, o)

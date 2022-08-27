@@ -1,15 +1,15 @@
 package stream
 
 import (
-	"github.com/yuvv/jog/util"
-	"github.com/yuvv/jog/util/function"
+	"github.com/yuvv/candy/function"
+	"github.com/yuvv/candy/iters"
 )
 
 type _ReferencePipeline[PIN, POUT any] struct {
 	_AbstractPipeline[PIN, POUT, Stream[POUT]]
 }
 
-func (receiver _ReferencePipeline[EIN, EOUT]) sourceStageSpliterator() util.Spliterator[EOUT] {
+func (receiver _ReferencePipeline[EIN, EOUT]) sourceStageSpliterator() iters.Spliterator[EOUT] {
 	// todo
 	return nil
 }

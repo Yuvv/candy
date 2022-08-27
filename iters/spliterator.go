@@ -1,9 +1,12 @@
-package util
+package iters
 
-import "github.com/yuvv/candy/util/function"
+import (
+	"github.com/yuvv/candy/function"
+	"github.com/yuvv/candy/lang"
+)
 
 type Spliterator[T any] interface {
-	TryAdvance(comparator Comparator[T]) bool
+	TryAdvance(comparator lang.Comparator[T]) bool
 
 	ForEachRemaining(consumer function.Consumer[T])
 
@@ -17,5 +20,5 @@ type Spliterator[T any] interface {
 
 	HasCharacteristics(characteristics int8) bool
 
-	GetComparator() Comparator[T]
+	GetComparator() lang.Comparator[T]
 }

@@ -1,4 +1,4 @@
-package util
+package lang
 
 type Comparator[T any] interface {
 	Compare(o1, o2 T) int

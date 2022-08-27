@@ -34,6 +34,15 @@ type IBinaryOperator[T any] interface {
 // BinaryOperator is func type of IBinaryOperator
 type BinaryOperator[T any] func(t, u T) T
 
+// IUnaryOperator represents an operation on a single operand that produces a result of the same type as its operand.
+// This is a specialization of Function for the case where the operand and result are of the same type.
+type IUnaryOperator[T any] interface {
+	Function[T, T]
+}
+
+// UnaryOperator is func type of IUnaryOperator
+type UnaryOperator[T any] func(t T) T
+
 // ISupplier represents a supplier of results.
 // There is no requirement that a new or distinct result be returned each
 // time the supplier is invoked.

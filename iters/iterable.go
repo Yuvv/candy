@@ -1,16 +1,15 @@
-package lang
+package iters
 
 import (
-	"github.com/yuvv/candy/util"
-	"github.com/yuvv/candy/util/function"
+	"github.com/yuvv/candy/function"
 )
 
 type Iterable[T any] interface {
-	Iterator() util.Iterator[T]
+	Iterator() Iterator[T]
 
 	ForEach(action function.Consumer[T])
 
-	Spliterator() util.Spliterator[T]
+	Spliterator() Spliterator[T]
 }
 
 //func (receiver Iterable[T]) ForEach(action function.Consumer[T]) {

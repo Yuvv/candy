@@ -1,8 +1,8 @@
-package util
+package optional
 
 import (
+	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/lang"
-	"github.com/yuvv/candy/util/function"
 )
 
 type Optional[T any] struct {

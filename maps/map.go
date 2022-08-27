@@ -2,8 +2,8 @@ package maps
 
 import (
 	"github.com/yuvv/candy/collections"
+	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/sets"
-	"github.com/yuvv/candy/util/function"
 )
 
 type MapEntry[K comparable, V any] interface {
