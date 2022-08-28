@@ -108,3 +108,17 @@ func (itr *ListItr[E]) Add(e E) {
 	itr.cursor = i + 1
 	itr.expectedModCount = itr.targetList.getModCount()
 }
+
+func NewListItr[E comparable](lst List[E]) *ListItr[E] {
+	return NewListItrFrom[E](lst, 0)
+}
+func NewListItrFrom[E comparable](lst List[E], fromIdx int) *ListItr[E] {
+	return &ListItr[E]{
+		Itr: Itr[E]{
+			cursor:           fromIdx,
+			lastRet:          -1,
+			expectedModCount: lst.getModCount(),
+			targetList:       lst,
+		},
+	}
+}

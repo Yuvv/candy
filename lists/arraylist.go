@@ -1,6 +1,8 @@
 package lists
 
 import (
+	"sort"
+
 	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/iters"
@@ -14,7 +16,7 @@ type ArrayList[E comparable] struct {
 }
 
 func (lst *ArrayList[E]) Iterator() iters.Iterator[E] {
-	return NewItr(lst)
+	return NewItr[E](lst)
 }
 
 func (lst *ArrayList[E]) ForEach(action function.Consumer[E]) {
@@ -54,6 +56,7 @@ func (lst *ArrayList[E]) ToArray() []E {
 }
 
 func (lst *ArrayList[E]) Add(e E) bool {
+	lst.modCount++
 	lst.slice = append(lst.slice, e)
 	return true
 }
@@ -65,6 +68,7 @@ func (lst *ArrayList[E]) Remove(o E) bool {
 				lst.slice[j-1] = lst.slice[j]
 			}
 			lst.slice = lst.slice[:len(lst.slice)-1]
+			lst.modCount++
 			return true
 		}
 	}
@@ -82,6 +86,7 @@ func (lst *ArrayList[E]) ContainsAll(collection collections.Collection[E]) bool 
 }
 
 func (lst *ArrayList[E]) AddAll(collection collections.Collection[E]) bool {
+	lst.modCount++
 	modified := false
 	it := collection.Iterator()
 	for it.HasNext() {
@@ -91,24 +96,23 @@ func (lst *ArrayList[E]) AddAll(collection collections.Collection[E]) bool {
 }
 
 func (lst *ArrayList[E]) RemoveAll(collection collections.Collection[E]) bool {
+	return lst.RemoveIf(collection.Contains)
+}
+
+func (lst *ArrayList[E]) RemoveIf(predicate function.Predicate[E]) bool {
 	i := 0
 	for j := 0; j < len(lst.slice); j++ {
-		if collection.Contains(lst.slice[j]) {
-			continue
+		if !predicate(lst.slice[j]) {
+			lst.slice[i] = lst.slice[j]
+			i++
 		}
-		lst.slice[i] = lst.slice[j]
-		i++
 	}
 	if i >= len(lst.slice) {
 		return false
 	}
 	lst.slice = lst.slice[:i]
+	lst.modCount++
 	return true
-}
-
-func (lst *ArrayList[E]) RemoveIf(predicate function.Predicate[E]) bool {
-	//TODO implement me
-	panic("implement me")
 }
 
 func (lst *ArrayList[E]) RetainAll(collection collections.Collection[E]) bool {
@@ -124,67 +128,107 @@ func (lst *ArrayList[E]) RetainAll(collection collections.Collection[E]) bool {
 }
 
 func (lst *ArrayList[E]) Clear() {
+	lst.modCount++
 	lst.slice = lst.slice[:0]
 }
 
 func (lst *ArrayList[E]) AddAllAt(idx int, collection collections.Collection[E]) {
-	//TODO implement me
-	panic("implement me")
+	lst.modCount++
+	nSlice := make([]E, len(lst.slice)+collection.Size())
+	i := 0
+	for i < idx {
+		nSlice[i] = lst.slice[i]
+		i++
+	}
+	it := collection.Iterator()
+	for it.HasNext() {
+		nSlice[i] = it.Next()
+		i++
+	}
+	for j := idx; j < len(lst.slice); j++ {
+		nSlice[i] = lst.slice[j]
+		i++
+	}
+	lst.slice = nSlice
 }
 
 func (lst *ArrayList[E]) ReplaceAll(operator function.UnaryOperator[E]) {
-	//TODO implement me
-	panic("implement me")
+	lst.modCount++
+	for i := 0; i < len(lst.slice); i++ {
+		lst.slice[i] = operator(lst.slice[i])
+	}
 }
 
 func (lst *ArrayList[E]) Sort(comparator lang.Comparator[E]) {
-	//TODO implement me
-	panic("implement me")
+	sort.Slice(lst.slice, func(i, j int) bool {
+		return comparator.Compare(lst.slice[i], lst.slice[j]) < 0
+	})
+	lst.modCount++
 }
 
 func (lst *ArrayList[E]) Get(idx int) E {
-	//TODO implement me
-	panic("implement me")
+	return lst.slice[idx]
 }
 
 func (lst *ArrayList[E]) Set(idx int, ele E) E {
-	//TODO implement me
-	panic("implement me")
+	origin := lst.slice[idx]
+	lst.slice[idx] = ele
+	return origin
 }
 
 func (lst *ArrayList[E]) AddAt(idx int, ele E) {
-	//TODO implement me
-	panic("implement me")
+	lst.modCount++
+	lst.slice = append(lst.slice, lst.slice[len(lst.slice)-1])
+	for i := len(lst.slice) - 2; i >= idx; i-- {
+		lst.slice[i+1] = lst.slice[i]
+	}
+	lst.slice[idx] = ele
 }
 
 func (lst *ArrayList[E]) RemoveAt(idx int) E {
-	//TODO implement me
-	panic("implement me")
+	origin := lst.slice[idx]
+	for i := idx + 1; i < len(lst.slice); i++ {
+		lst.slice[i-1] = lst.slice[i]
+	}
+	lst.slice = lst.slice[:len(lst.slice)-1]
+	lst.modCount++
+	return origin
 }
 
 func (lst *ArrayList[E]) IndexOf(o E) int {
-	//TODO implement me
-	panic("implement me")
+	for i, item := range lst.slice {
+		if item == o {
+			return i
+		}
+	}
+	return -1
 }
 
 func (lst *ArrayList[E]) LastIndexOf(o E) int {
-	//TODO implement me
-	panic("implement me")
+	for i := len(lst.slice) - 1; i >= 0; i-- {
+		if lst.slice[i] == o {
+			return i
+		}
+	}
+	return -1
 }
 
 func (lst *ArrayList[E]) ListIterator() iters.ListIterator[E] {
-	//TODO implement me
-	panic("implement me")
+	return NewListItr[E](lst)
 }
 
 func (lst *ArrayList[E]) ListIteratorFrom(idx int) iters.ListIterator[E] {
-	//TODO implement me
-	panic("implement me")
+	return NewListItrFrom[E](lst, idx)
 }
 
+// SubList return a new list with elements from fromIdx (inclusive) to toIdx (exclusive)
 func (lst *ArrayList[E]) SubList(fromIdx, toIdx int) List[E] {
-	//TODO implement me
-	panic("implement me")
+	return &ArrayList[E]{
+		AbstractList: AbstractList[E]{
+			modCount: lst.modCount,
+		},
+		slice: lst.slice[fromIdx:toIdx],
+	}
 }
 
 func (lst *ArrayList[E]) getModCount() int {

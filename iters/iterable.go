@@ -4,7 +4,7 @@ import (
 	"github.com/yuvv/candy/function"
 )
 
-type Iterable[T any] interface {
+type Iterable[T comparable] interface {
 	Iterator() Iterator[T]
 
 	ForEach(action function.Consumer[T])

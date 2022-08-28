@@ -4,7 +4,7 @@ import (
 	"github.com/yuvv/candy/function"
 )
 
-type Iterator[E any] interface {
+type Iterator[E comparable] interface {
 	HasNext() bool
 
 	Next() E
@@ -14,7 +14,7 @@ type Iterator[E any] interface {
 	ForEachRemaining(action function.Consumer[E])
 }
 
-type AbstractIterator[E any] struct {
+type AbstractIterator[E comparable] struct {
 }
 
 func (a *AbstractIterator[E]) HasNext() bool {
@@ -35,7 +35,7 @@ func (a *AbstractIterator[E]) ForEachRemaining(action function.Consumer[E]) {
 	}
 }
 
-type ListIterator[E any] interface {
+type ListIterator[E comparable] interface {
 	Iterator[E]
 
 	HasPrevious() bool
