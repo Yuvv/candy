@@ -100,6 +100,41 @@ func TestCollection(t *testing.T) {
 	}
 }
 
-func TestList(t *testing.T) {
-	//
+func Test_ArrayList_AddAt(t *testing.T) {
+	lst := NewArrayListWithEle[int](1, 2, 3, 4, 5)
+	originSize := lst.Size()
+	lst.AddAt(0, 0)
+	if lst.Size() != originSize+1 {
+		t.Fatalf("size should be %d after add 1 element", originSize+1)
+	}
+	for i := 0; i < lst.Size(); i++ {
+		if lst.Get(i) != i {
+			t.Fatalf("element at `%d` should be `%d`", i, i)
+		}
+	}
+
+	originSize = lst.Size()
+	lst.AddAt(lst.Size(), 6)
+	if lst.Size() != originSize+1 {
+		t.Fatalf("size should be %d after add 1 element", originSize+1)
+	}
+	for i := 0; i < lst.Size(); i++ {
+		if lst.Get(i) != i {
+			t.Fatalf("element at `%d` should be `%d`", i, i)
+		}
+	}
+
+	originSize = lst.Size()
+	lst.AddAt(2, 2)
+	if lst.Size() != originSize+1 {
+		t.Fatalf("size should be %d after add 1 element", originSize+1)
+	}
+	for i := 0; i < lst.Size(); i++ {
+		if i <= 2 && lst.Get(i) != i {
+			t.Fatalf("element at `%d` should be `%d`", i, i)
+		} else if i > 2 && lst.Get(i) != i-1 {
+			t.Fatalf("element at `%d` should be `%d`", i, i-1)
+		}
+	}
+
 }

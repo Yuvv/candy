@@ -61,17 +61,17 @@ func (h *HashMap[K, V]) KeySet() sets.Set[K] {
 }
 
 func (h *HashMap[K, V]) Values() collections.Collection[V] {
-	list := lists.NewArrayListWithCap[V](h.Size())
+	list := lists.NewSpecArrayListWithCap[V](h.vEqualMethod, h.Size())
 	for _, v := range h.hMap {
 		list.Add(v)
 	}
 	return list
 }
 
-func (h *HashMap[K, V]) EntrySet() sets.Set[MapEntry[K, V]] {
-	set := sets.NewHashSetWithCap[MapEntry[K, V]](h.Size())
+func (h *HashMap[K, V]) EntrySet() sets.Set[*DefaultMapEntry[K, V]] {
+	set := sets.NewHashSetWithCap[*DefaultMapEntry[K, V]](h.Size())
 	for k, v := range h.hMap {
-		set.Add(DefaultMapEntry[K, V]{k, v})
+		set.Add(&DefaultMapEntry[K, V]{k, v})
 	}
 	return set
 }
@@ -108,17 +108,40 @@ func (h *HashMap[K, V]) ReplaceAll(biFunction function.BiFunction[K, V, V]) {
 // ---------------------------------------------------------------------------
 
 // NewHashMap return a hashmap
-func NewHashMap[K comparable, V any]() *HashMap[K, V] {
+func NewHashMap[K comparable, V comparable]() *HashMap[K, V] {
 	return &HashMap[K, V]{
+		AbstractMap: AbstractMap[K, V]{
+			vEqualMethod: func(x V, other any) bool {
+				return x == other
+			},
+		},
 		hMap: map[K]V{},
 	}
 }
 
 // NewHashMapWithMap initialize a hashmap with a specific aMap
-func NewHashMapWithMap[K comparable, V any](aMap Map[K, V]) *HashMap[K, V] {
-	hm := &HashMap[K, V]{
+func NewHashMapWithMap[K comparable, V comparable](aMap Map[K, V]) *HashMap[K, V] {
+	hm := NewHashMap[K, V]()
+	hm.PutAll(aMap)
+	return hm
+}
+
+// NewSpecHashMap return a hashmap
+func NewSpecHashMap[K comparable, V any](vem func(x V, other any) bool) *HashMap[K, V] {
+	if vem == nil {
+		panic("param vem cannot be nil")
+	}
+	return &HashMap[K, V]{
+		AbstractMap: AbstractMap[K, V]{
+			vEqualMethod: vem,
+		},
 		hMap: map[K]V{},
 	}
+}
+
+// NewSpecHashMapWithMap initialize a hashmap with a specific aMap
+func NewSpecHashMapWithMap[K comparable, V any](vem func(x V, other any) bool, aMap Map[K, V]) *HashMap[K, V] {
+	hm := NewSpecHashMap[K, V](vem)
 	hm.PutAll(aMap)
 	return hm
 }

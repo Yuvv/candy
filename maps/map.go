@@ -18,15 +18,15 @@ type DefaultMapEntry[K comparable, V any] struct {
 	value V
 }
 
-func (e DefaultMapEntry[K, V]) GetKey() K {
+func (e *DefaultMapEntry[K, V]) GetKey() K {
 	return e.key
 }
 
-func (e DefaultMapEntry[K, V]) GetValue() V {
+func (e *DefaultMapEntry[K, V]) GetValue() V {
 	return e.value
 }
 
-func (e DefaultMapEntry[K, V]) SetValue(v V) V {
+func (e *DefaultMapEntry[K, V]) SetValue(v V) V {
 	originV := e.value
 	e.value = v
 	return originV
@@ -37,7 +37,7 @@ type Map[K comparable, V any] interface {
 
 	IsEmpty() bool
 
-	ContainsKey(o comparable) bool
+	ContainsKey(o K) bool
 	Get(key K) V
 	Put(key K, value V) V
 	Remove(key K) V
@@ -64,6 +64,7 @@ type Map[K comparable, V any] interface {
 }
 
 type AbstractMap[K comparable, V any] struct {
+	vEqualMethod func(x V, other any) bool
 }
 
 func (m *AbstractMap[K, V]) Size() int {

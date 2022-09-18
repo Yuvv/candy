@@ -5,7 +5,7 @@ import (
 	"github.com/yuvv/candy/iters"
 )
 
-type Itr[E comparable] struct {
+type Itr[E any] struct {
 	iters.AbstractIterator[E]
 
 	cursor           int // 0
@@ -54,7 +54,7 @@ func (itr *Itr[E]) checkForCoModification() {
 	}
 }
 
-func NewItr[E comparable](lst List[E]) *Itr[E] {
+func NewItr[E any](lst List[E]) *Itr[E] {
 	return &Itr[E]{
 		cursor:           0,
 		lastRet:          -1,
@@ -66,7 +66,7 @@ func NewItr[E comparable](lst List[E]) *Itr[E] {
 // ---------------------------------------------------------------------
 
 // ListItr implements ListIterator
-type ListItr[E comparable] struct {
+type ListItr[E any] struct {
 	Itr[E]
 }
 
@@ -109,10 +109,10 @@ func (itr *ListItr[E]) Add(e E) {
 	itr.expectedModCount = itr.targetList.getModCount()
 }
 
-func NewListItr[E comparable](lst List[E]) *ListItr[E] {
+func NewListItr[E any](lst List[E]) *ListItr[E] {
 	return NewListItrFrom[E](lst, 0)
 }
-func NewListItrFrom[E comparable](lst List[E], fromIdx int) *ListItr[E] {
+func NewListItrFrom[E any](lst List[E], fromIdx int) *ListItr[E] {
 	return &ListItr[E]{
 		Itr: Itr[E]{
 			cursor:           fromIdx,

@@ -7,7 +7,7 @@ import (
 	"github.com/yuvv/candy/lang"
 )
 
-type List[E comparable] interface {
+type List[E any] interface {
 	collections.Collection[E]
 
 	AddAllAt(idx int, collection collections.Collection[E])
@@ -37,10 +37,12 @@ type List[E comparable] interface {
 	getModCount() int
 }
 
-type AbstractList[E comparable] struct {
+type AbstractList[E any] struct {
 	collections.AbstractCollection[E]
 
 	modCount int
+
+	equalMethod func(x E, other any) bool
 }
 
 func (a *AbstractList[E]) Iterator() iters.Iterator[E] {
@@ -141,7 +143,7 @@ func (a *AbstractList[E]) RemoveAt(idx int) E {
 func (a *AbstractList[E]) IndexOf(o E) int {
 	it := a.ListIterator()
 	for it.HasNext() {
-		if it.Next() == o {
+		if a.equalMethod(it.Next(), o) {
 			return it.PreviousIndex()
 		}
 	}
@@ -151,7 +153,7 @@ func (a *AbstractList[E]) IndexOf(o E) int {
 func (a *AbstractList[E]) LastIndexOf(o E) int {
 	it := a.ListIteratorFrom(a.Size())
 	for it.HasNext() {
-		if it.Next() == o {
+		if a.equalMethod(it.Next(), o) {
 			return it.NextIndex()
 		}
 	}
@@ -171,4 +173,8 @@ func (a *AbstractList[E]) ListIteratorFrom(idx int) iters.ListIterator[E] {
 func (a *AbstractList[E]) SubList(fromIdx, toIdx int) List[E] {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (a *AbstractList[E]) GetEleEqualMethod() func(x E, other any) bool {
+	return a.equalMethod
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/yuvv/candy/iters"
 )
 
-type Collection[E comparable] interface {
+type Collection[E any] interface {
 	iters.Iterable[E]
 
 	Size() int
@@ -38,7 +38,10 @@ type Collection[E comparable] interface {
 }
 
 // AbstractCollection is the abstraction of Collection
-type AbstractCollection[E comparable] struct {
+type AbstractCollection[E any] struct {
+
+	// GetEleEqualMethod return the func to check elements equals
+	GetEleEqualMethod func() func(x E, other any) bool
 }
 
 // Iterator is abstract method
@@ -70,7 +73,7 @@ func (a *AbstractCollection[E]) IsEmpty() bool {
 func (a *AbstractCollection[E]) Contains(o E) bool {
 	it := a.Iterator()
 	for it.HasNext() {
-		if it.Next() == o {
+		if a.GetEleEqualMethod()(it.Next(), o) {
 			return true
 		}
 	}
@@ -95,7 +98,7 @@ func (a *AbstractCollection[E]) Add(e E) bool {
 func (a *AbstractCollection[E]) Remove(o E) bool {
 	it := a.Iterator()
 	for it.HasNext() {
-		if it.Next() == o {
+		if a.GetEleEqualMethod()(it.Next(), o) {
 			it.Remove()
 			return true
 		}

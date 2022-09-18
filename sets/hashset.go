@@ -149,9 +149,7 @@ func (h *HashSet[E]) Clear() {
 
 // NewHashSet return a new hashset
 func NewHashSet[E comparable]() *HashSet[E] {
-	return &HashSet[E]{
-		set: map[E]bool{},
-	}
+	return NewHashSetWithCap[E](4)
 }
 
 // NewHashSetWithCap return a new hashset with expected capacity
