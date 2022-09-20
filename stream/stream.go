@@ -2,7 +2,6 @@ package stream
 
 import (
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
 	"github.com/yuvv/candy/lang"
 	"github.com/yuvv/candy/optional"
 	"github.com/yuvv/candy/sets"
@@ -38,27 +37,28 @@ type Collector[T, A, R any] interface {
 }
 
 // BaseStream interface
-type BaseStream[T any, S BaseStream[T, S]] interface {
-	lang.AutoCloseable
-
-	Iterator()
-
-	Spliterator() iters.Spliterator[T]
-
-	IsParallel() bool
-
-	Sequential() S
-
-	Parallel() S
-
-	Unordered() S
-
-	OnClose(runnable lang.Runnable) S
-}
+//type BaseStream[T any, S BaseStream[T, S]] interface {
+//	lang.AutoCloseable
+//
+//	Iterator()
+//
+//	Spliterator() iters.Spliterator[T]
+//
+//	IsParallel() bool
+//
+//	Sequential() S
+//
+//	Parallel() S
+//
+//	Unordered() S
+//
+//	OnClose(runnable lang.Runnable) S
+//}
 
 // Stream interface
 type Stream[T any] interface {
-	BaseStream[T, Stream[T]]
+	// todo: @yuvv
+	// BaseStream[T, Stream[T]]
 
 	Filter(predicate function.Predicate[T]) Stream[T]
 

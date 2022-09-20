@@ -17,7 +17,7 @@ type PipelineHelper[POUT any] interface {
 	// todo: others
 }
 
-type _AbstractPipeline[EIN, EOUT any, S BaseStream[EOUT, S]] struct {
+type _AbstractPipeline[EIN, EOUT any, S Stream[EOUT]] struct {
 	PipelineHelper[EOUT]
 
 	// sourceStage is backlink to the head of the pipeline chain (self if this is the source stage).
