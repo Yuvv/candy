@@ -1,4 +1,4 @@
-package iters
+package iter
 
 import (
 	"github.com/yuvv/candy/function"

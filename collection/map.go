@@ -1,9 +1,7 @@
-package maps
+package collection
 
 import (
-	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/sets"
 )
 
 type MapEntry[K comparable, V any] interface {
@@ -46,11 +44,11 @@ type Map[K comparable, V any] interface {
 
 	Clear()
 
-	KeySet() sets.Set[K]
+	KeySet() Set[K]
 
-	Values() collections.Collection[V]
+	Values() Collection[V]
 
-	EntrySet() sets.Set[MapEntry[K, V]]
+	EntrySet() Set[MapEntry[K, V]]
 
 	GetOrDefault(key K, dv V) V
 	PutIfAbsent(key K, val V) V

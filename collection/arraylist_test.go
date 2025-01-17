@@ -1,4 +1,4 @@
-package lists
+package collection
 
 import "testing"
 

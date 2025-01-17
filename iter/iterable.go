@@ -1,4 +1,4 @@
-package iters
+package iter
 
 import (
 	"github.com/yuvv/candy/function"
@@ -11,9 +11,3 @@ type Iterable[T any] interface {
 
 	Spliterator() Spliterator[T]
 }
-
-//func (receiver Iterable[T]) ForEach(action function.Consumer[T]) {
-//	if action == nil {
-//		panic("action should not be nil")
-//	}
-//}

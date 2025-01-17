@@ -1,12 +1,12 @@
-package collections
+package collection
 
 import (
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 )
 
 type Collection[E any] interface {
-	iters.Iterable[E]
+	iter.Iterable[E]
 
 	Size() int
 
@@ -31,10 +31,6 @@ type Collection[E any] interface {
 	RetainAll(collection Collection[E]) bool
 
 	Clear()
-
-	//Stream() stream.Stream[E]
-	//
-	//ParallelStream() stream.Stream[E]
 }
 
 // AbstractCollection is the abstraction of Collection
@@ -45,7 +41,7 @@ type AbstractCollection[E any] struct {
 }
 
 // Iterator is abstract method
-func (a *AbstractCollection[E]) Iterator() iters.Iterator[E] {
+func (a *AbstractCollection[E]) Iterator() iter.Iterator[E] {
 	panic("implement me")
 }
 
@@ -56,7 +52,7 @@ func (a *AbstractCollection[E]) ForEach(action function.Consumer[E]) {
 	}
 }
 
-func (a *AbstractCollection[E]) Spliterator() iters.Spliterator[E] {
+func (a *AbstractCollection[E]) Spliterator() iter.Spliterator[E] {
 	//TODO implement me
 	panic("implement me")
 }

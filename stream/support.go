@@ -2,7 +2,7 @@ package stream
 
 import (
 	"github.com/yuvv/candy/function"
-	jogu "github.com/yuvv/candy/iters"
+	jogu "github.com/yuvv/candy/iter"
 )
 
 func SupportBySpliterator[T any](spliterator jogu.Spliterator[T], parallel bool) Stream[T] {

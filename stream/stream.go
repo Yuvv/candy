@@ -1,10 +1,10 @@
 package stream
 
 import (
+	"github.com/yuvv/candy/collection"
 	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/lang"
 	"github.com/yuvv/candy/optional"
-	"github.com/yuvv/candy/sets"
 )
 
 type Characteristics int8
@@ -33,7 +33,7 @@ type Collector[T, A, R any] interface {
 
 	Finisher() function.Function[A, R]
 
-	Characteristics() sets.Set[Characteristics]
+	Characteristics() collection.Set[Characteristics]
 }
 
 // BaseStream interface
@@ -42,7 +42,7 @@ type Collector[T, A, R any] interface {
 //
 //	Iterator()
 //
-//	Spliterator() iters.Spliterator[T]
+//	Spliterator() iter.Spliterator[T]
 //
 //	IsParallel() bool
 //
