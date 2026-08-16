@@ -1,7 +1,7 @@
 package types
 
 type unsignedFlag interface {
-	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64
+	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
 type BitFlag[T unsignedFlag] struct {

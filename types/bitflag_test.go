@@ -3,6 +3,12 @@ package types
 import "testing"
 
 func TestBitFlag(t *testing.T) {
+	var uintptrFlags BitFlag[uintptr]
+	uintptrFlags.Set(1)
+	if !uintptrFlags.Has(1) {
+		t.Fatalf("uintptr BitFlag missing set flag: %d", uintptrFlags.Value())
+	}
+
 	var flags BitFlag[uint8]
 	flags.Set(1)
 	flags.Set(4)
