@@ -66,6 +66,10 @@ func (h *HashSet[E]) Size() int {
 	return len(h.set)
 }
 
+func (h *HashSet[E]) IsEmpty() bool {
+	return len(h.set) == 0
+}
+
 func (h *HashSet[E]) Contains(o E) bool {
 	oType := reflect.TypeOf(o)
 	if !oType.Comparable() {

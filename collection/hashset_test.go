@@ -2,6 +2,18 @@ package collection
 
 import "testing"
 
+func TestHashSetIsEmpty(t *testing.T) {
+	set := NewHashSet[int]()
+	if !set.IsEmpty() {
+		t.Fatal("new set is not empty")
+	}
+
+	set.Add(1)
+	if set.IsEmpty() {
+		t.Fatal("set with an element is empty")
+	}
+}
+
 func TestHashSetIteratorVisitsSnapshotValues(t *testing.T) {
 	set := NewHashSet[int]()
 	set.Add(1)
