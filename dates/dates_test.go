@@ -122,14 +122,25 @@ func TestParseAndFormatDate(t *testing.T) {
 }
 
 func TestTodayYesterdayTomorrowRelations(t *testing.T) {
-	today := BeginOfDay(Today())
-	yesterday := BeginOfDay(Yesterday())
-	tomorrow := BeginOfDay(Tomorrow())
+	assertCurrentDayHelper := func(name string, got, before, after time.Time) {
+		if got.Equal(before) || got.Equal(after) {
+			return
+		}
+		t.Fatalf("BeginOfDay(%s()) = %v, want %v or %v", name, got, before, after)
+	}
 
-	if want := today.AddDate(0, 0, -1); !yesterday.Equal(want) {
-		t.Fatalf("BeginOfDay(Yesterday()) = %v, want %v", yesterday, want)
-	}
-	if want := today.AddDate(0, 0, 1); !tomorrow.Equal(want) {
-		t.Fatalf("BeginOfDay(Tomorrow()) = %v, want %v", tomorrow, want)
-	}
+	before := BeginOfDay(time.Now())
+	today := BeginOfDay(Today())
+	after := BeginOfDay(time.Now())
+	assertCurrentDayHelper("Today", today, before, after)
+
+	before = BeginOfDay(time.Now()).AddDate(0, 0, -1)
+	yesterday := BeginOfDay(Yesterday())
+	after = BeginOfDay(time.Now()).AddDate(0, 0, -1)
+	assertCurrentDayHelper("Yesterday", yesterday, before, after)
+
+	before = BeginOfDay(time.Now()).AddDate(0, 0, 1)
+	tomorrow := BeginOfDay(Tomorrow())
+	after = BeginOfDay(time.Now()).AddDate(0, 0, 1)
+	assertCurrentDayHelper("Tomorrow", tomorrow, before, after)
 }
