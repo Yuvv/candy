@@ -1,94 +1,77 @@
 package optional
 
-import (
-	"reflect"
-
-	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/lang"
-)
-
+// Optional is a container object which may or may not contain a value.
 type Optional[T any] struct {
-	// if non-null, the value;
-	// if null, indicates no value is present.
-	value T
-	//
-	nillable bool
-	nilValue T
+	value   T
+	present bool
 }
 
-func (receiver *Optional[T]) Get() T {
-	//if receiver.nillable && receiver.value == receiver.nilValue {
-	//	panic("No value present")
-	//}
+// Empty returns an empty Optional.
+func Empty[T any]() Optional[T] {
+	return Optional[T]{}
+}
+
+// Of returns an Optional describing value.
+func Of[T any](value T) Optional[T] {
+	return Optional[T]{
+		value:   value,
+		present: true,
+	}
+}
+
+// IsPresent returns true if there is a value present.
+func (receiver Optional[T]) IsPresent() bool {
+	return receiver.present
+}
+
+// IsEmpty returns true if there is no value present.
+func (receiver Optional[T]) IsEmpty() bool {
+	return !receiver.present
+}
+
+// Get returns the present value or panics if no value is present.
+func (receiver Optional[T]) Get() T {
+	if receiver.IsEmpty() {
+		panic("optional: no value present")
+	}
 	return receiver.value
 }
 
-func (receiver *Optional[T]) IsPresent() bool {
-	return !receiver.nillable || !reflect.DeepEqual(receiver.value, receiver.nilValue)
-}
-
-func (receiver *Optional[T]) OrElse(orElse T) T {
+// OrElse returns the present value, otherwise defaultValue.
+func (receiver Optional[T]) OrElse(defaultValue T) T {
 	if receiver.IsPresent() {
 		return receiver.value
 	}
-	return orElse
+	return defaultValue
 }
 
-func (receiver *Optional[T]) IsEmpty() bool {
-	return receiver.nillable && reflect.DeepEqual(receiver.value, receiver.nilValue)
+// OrElseGet returns the present value, otherwise the value supplied by supplier.
+func (receiver Optional[T]) OrElseGet(supplier func() T) T {
+	if receiver.IsPresent() {
+		return receiver.value
+	}
+	return supplier()
 }
 
-func (receiver *Optional[T]) IfPresent(consumer function.Consumer[T]) {
+// IfPresent calls consumer with the value if there is one present.
+func (receiver Optional[T]) IfPresent(consumer func(T)) {
 	if receiver.IsPresent() {
 		consumer(receiver.value)
 	}
 }
 
-func (receiver *Optional[T]) IfPresentOrElse(consumer function.Consumer[T], emptyAction lang.Runnable) {
-	if receiver.IsPresent() {
-		consumer(receiver.value)
-	} else {
-		emptyAction.Run()
+// Map returns an Optional containing the mapped value if optional is present.
+func Map[T any, R any](optional Optional[T], mapper func(T) R) Optional[R] {
+	if optional.IsEmpty() {
+		return Empty[R]()
 	}
+	return Of(mapper(optional.value))
 }
 
-func Empty[T any]() *Optional[T] {
-	var val T
-	return &Optional[T]{
-		value:    val,
-		nillable: true,
-		nilValue: val,
+// FlatMap returns the Optional produced by mapper if optional is present.
+func FlatMap[T any, R any](optional Optional[T], mapper func(T) Optional[R]) Optional[R] {
+	if optional.IsEmpty() {
+		return Empty[R]()
 	}
-}
-
-func Of[T any](t T) *Optional[T] {
-	optional := OfNillable[T](t)
-	if optional.nillable {
-		panic("value is required non-nil")
-	}
-	return optional
-}
-
-func OfNillable[T any](t T) *Optional[T] {
-	nullable := true
-	tType := reflect.TypeOf(t)
-	switch tType.Kind() {
-	case reflect.Bool,
-		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
-		reflect.Uintptr,
-		reflect.Float32, reflect.Float64,
-		reflect.Complex64, reflect.Complex128,
-		reflect.String,
-		reflect.Struct:
-		nullable = false
-		break
-	}
-
-	var nv T
-	return &Optional[T]{
-		value:    t,
-		nillable: nullable,
-		nilValue: nv,
-	}
+	return mapper(optional.value)
 }
