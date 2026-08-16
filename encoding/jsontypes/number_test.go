@@ -65,6 +65,8 @@ func TestAdaptiveNumberUnmarshalInvalidValue(t *testing.T) {
 		{name: "quoted nan", input: `"NaN"`},
 		{name: "quoted infinity", input: `"Infinity"`},
 		{name: "quoted hex float", input: `"0x1p2"`},
+		{name: "overflow integer", input: `9223372036854775808`},
+		{name: "quoted overflow integer", input: `"9223372036854775808"`},
 	}
 
 	for _, tt := range tests {

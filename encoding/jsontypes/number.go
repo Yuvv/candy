@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // AdaptiveNumber unmarshals JSON numbers from numeric and string forms.
@@ -26,15 +27,21 @@ func (n *AdaptiveNumber) UnmarshalJSON(data []byte) error {
 		if err := json.Unmarshal(data, &text); err != nil {
 			return err
 		}
-		if text == "" {
-			n.clear()
-			return nil
-		}
 	} else {
 		text = string(data)
 	}
 
-	if intValue, err := strconv.ParseInt(text, 10, 64); err == nil {
+	text = strings.TrimSpace(text)
+	if text == "" {
+		n.clear()
+		return nil
+	}
+
+	if isIntegerToken(text) {
+		intValue, err := strconv.ParseInt(text, 10, 64)
+		if err != nil {
+			return fmt.Errorf("jsontypes: invalid AdaptiveNumber integer value %q", text)
+		}
 		n.setInt(intValue)
 		return nil
 	}
@@ -113,6 +120,24 @@ func (n AdaptiveNumber) Float64Ptr() *float64 {
 	}
 	value := *n.floatValue
 	return &value
+}
+
+func isIntegerToken(text string) bool {
+	if text == "" {
+		return false
+	}
+	if text[0] == '-' {
+		text = text[1:]
+		if text == "" {
+			return false
+		}
+	}
+	for _, r := range text {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func (n *AdaptiveNumber) clear() {
