@@ -13,13 +13,42 @@ type HashSet[E comparable] struct {
 	set map[E]bool
 }
 
-type hashsetIter struct {
-	// todo:
+type hashsetIter[E comparable] struct {
+	set       *HashSet[E]
+	values    []E
+	next      int
+	last      E
+	canRemove bool
+}
+
+func (i *hashsetIter[E]) HasNext() bool {
+	return i.next < len(i.values)
+}
+
+func (i *hashsetIter[E]) Next() E {
+	value := i.values[i.next]
+	i.next++
+	i.last = value
+	i.canRemove = true
+	return value
+}
+
+func (i *hashsetIter[E]) Remove() {
+	if !i.canRemove {
+		panic("IllegalStateException")
+	}
+	i.set.Remove(i.last)
+	i.canRemove = false
+}
+
+func (i *hashsetIter[E]) ForEachRemaining(action function.Consumer[E]) {
+	for i.HasNext() {
+		action(i.Next())
+	}
 }
 
 func (h *HashSet[E]) Iterator() iter.Iterator[E] {
-	//TODO implement me
-	panic("implement me")
+	return &hashsetIter[E]{set: h, values: h.ToArray()}
 }
 
 func (h *HashSet[E]) ForEach(action function.Consumer[E]) {
@@ -86,8 +115,7 @@ func (h *HashSet[E]) AddAll(collection Collection[E]) bool {
 	modified := false
 	it := collection.Iterator()
 	for it.HasNext() {
-		h.set[it.Next()] = true
-		modified = true
+		modified = h.Add(it.Next()) || modified
 	}
 	return modified
 }
