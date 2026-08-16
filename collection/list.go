@@ -45,28 +45,23 @@ type AbstractList[E any] struct {
 }
 
 func (a *AbstractList[E]) Iterator() iter.Iterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Iterator must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) ForEach(action function.Consumer[E]) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ForEach must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Spliterator must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Contains(o E) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Contains must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) ToArray() []E {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ToArray must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Add(e E) bool {
@@ -75,68 +70,55 @@ func (a *AbstractList[E]) Add(e E) bool {
 }
 
 func (a *AbstractList[E]) Remove(o E) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Remove must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) ContainsAll(collection Collection[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ContainsAll must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) AddAll(collection Collection[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.AddAll must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) RemoveAll(collection Collection[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.RemoveAll must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) RemoveIf(predicate function.Predicate[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.RemoveIf must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) RetainAll(collection Collection[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.RetainAll must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) AddAllAt(idx int, collection Collection[E]) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.AddAllAt must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) ReplaceAll(operator function.UnaryOperator[E]) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ReplaceAll must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Sort(comparator lang.Comparator[E]) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Sort must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Get(idx int) E {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Get must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) Set(idx int, ele E) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.Set must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) AddAt(idx int, ele E) {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.AddAt must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) RemoveAt(idx int) E {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.RemoveAt must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) IndexOf(o E) int {
@@ -160,18 +142,15 @@ func (a *AbstractList[E]) LastIndexOf(o E) int {
 }
 
 func (a *AbstractList[E]) ListIterator() iter.ListIterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ListIterator must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) ListIteratorFrom(idx int) iter.ListIterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.ListIteratorFrom must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) SubList(fromIdx, toIdx int) List[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractList.SubList must be implemented by concrete list")
 }
 
 func (a *AbstractList[E]) GetEleEqualMethod() func(x E, other any) bool {

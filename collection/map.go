@@ -66,7 +66,7 @@ type AbstractMap[K comparable, V any] struct {
 }
 
 func (m *AbstractMap[K, V]) Size() int {
-	panic("implement me")
+	panic("collection: AbstractMap.Size must be implemented by concrete map")
 }
 
 func (m *AbstractMap[K, V]) IsEmpty() bool {

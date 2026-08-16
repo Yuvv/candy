@@ -58,8 +58,7 @@ func (h *HashSet[E]) ForEach(action function.Consumer[E]) {
 }
 
 func (h *HashSet[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: HashSet.Spliterator is unsupported")
 }
 
 func (h *HashSet[E]) Size() int {

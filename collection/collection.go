@@ -46,6 +46,9 @@ type AbstractCollection[E any] struct {
 
 // Iterator is abstract method
 func (a *AbstractCollection[E]) Iterator() iter.Iterator[E] {
+	if a.iteratorMethod == nil {
+		panic("collection: AbstractCollection.Iterator must be implemented by concrete collection")
+	}
 	return a.iteratorMethod()
 }
 
@@ -57,12 +60,14 @@ func (a *AbstractCollection[E]) ForEach(action function.Consumer[E]) {
 }
 
 func (a *AbstractCollection[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractCollection.Spliterator is unsupported")
 }
 
 // Size is abstract method
 func (a *AbstractCollection[E]) Size() int {
+	if a.sizeMethod == nil {
+		panic("collection: AbstractCollection.Size must be implemented by concrete collection")
+	}
 	return a.sizeMethod()
 }
 
@@ -91,6 +96,9 @@ func (a *AbstractCollection[E]) ToArray() []E {
 
 // Add is abstract method
 func (a *AbstractCollection[E]) Add(e E) bool {
+	if a.addMethod == nil {
+		panic("collection: AbstractCollection.Add must be implemented by concrete collection")
+	}
 	return a.addMethod(e)
 }
 

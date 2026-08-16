@@ -18,15 +18,15 @@ type AbstractIterator[E any] struct {
 }
 
 func (a *AbstractIterator[E]) HasNext() bool {
-	panic("implement me")
+	panic("iter: AbstractIterator.HasNext must be implemented by concrete iterator")
 }
 
 func (a *AbstractIterator[E]) Next() E {
-	panic("implement me")
+	panic("iter: AbstractIterator.Next must be implemented by concrete iterator")
 }
 
 func (a *AbstractIterator[E]) Remove() {
-	panic("implement me")
+	panic("iter: AbstractIterator.Remove must be implemented by concrete iterator")
 }
 
 func (a *AbstractIterator[E]) ForEachRemaining(action function.Consumer[E]) {

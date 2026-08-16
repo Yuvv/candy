@@ -26,8 +26,7 @@ func (lst *_ArrayList[E]) ForEach(action function.Consumer[E]) {
 }
 
 func (lst *_ArrayList[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: ArrayList.Spliterator is unsupported")
 }
 
 func (lst *_ArrayList[E]) Size() int {
