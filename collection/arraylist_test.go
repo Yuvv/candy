@@ -263,3 +263,14 @@ func Test_ArrayList_ClearEmptyDoesNotModify(t *testing.T) {
 		t.Fatalf("Clear modCount = %d, want %d", lst.modCount, before)
 	}
 }
+
+func Test_ArrayList_ClearNonEmptyModifies(t *testing.T) {
+	lst := NewArrayListWithEle(1)
+	before := lst.modCount
+
+	lst.Clear()
+
+	if lst.modCount != before+1 {
+		t.Fatalf("Clear modCount = %d, want %d", lst.modCount, before+1)
+	}
+}
