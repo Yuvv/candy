@@ -88,6 +88,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### Superpowers / agent-local planning artifacts
+docs/superpowers/
+
 ### macOS template
 # General
 .DS_Store
