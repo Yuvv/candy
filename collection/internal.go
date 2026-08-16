@@ -1,12 +1,12 @@
-package lists
+package collection
 
 import (
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 )
 
 type Itr[E any] struct {
-	iters.AbstractIterator[E]
+	iter.AbstractIterator[E]
 
 	cursor           int // 0
 	lastRet          int // -1

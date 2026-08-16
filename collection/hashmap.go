@@ -1,10 +1,7 @@
-package maps
+package collection
 
 import (
-	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/lists"
-	"github.com/yuvv/candy/sets"
 )
 
 type HashMap[K comparable, V any] struct {
@@ -52,24 +49,24 @@ func (h *HashMap[K, V]) Clear() {
 	}
 }
 
-func (h *HashMap[K, V]) KeySet() sets.Set[K] {
-	set := sets.NewHashSetWithCap[K](len(h.hMap))
+func (h *HashMap[K, V]) KeySet() Set[K] {
+	set := NewHashSetWithCap[K](len(h.hMap))
 	for k := range h.hMap {
 		set.Add(k)
 	}
 	return set
 }
 
-func (h *HashMap[K, V]) Values() collections.Collection[V] {
-	list := lists.NewSpecArrayListWithCap[V](h.vEqualMethod, h.Size())
+func (h *HashMap[K, V]) Values() Collection[V] {
+	list := NewSpecArrayListWithCap[V](h.vEqualMethod, h.Size())
 	for _, v := range h.hMap {
 		list.Add(v)
 	}
 	return list
 }
 
-func (h *HashMap[K, V]) EntrySet() sets.Set[*DefaultMapEntry[K, V]] {
-	set := sets.NewHashSetWithCap[*DefaultMapEntry[K, V]](h.Size())
+func (h *HashMap[K, V]) EntrySet() Set[*DefaultMapEntry[K, V]] {
+	set := NewHashSetWithCap[*DefaultMapEntry[K, V]](h.Size())
 	for k, v := range h.hMap {
 		set.Add(&DefaultMapEntry[K, V]{k, v})
 	}

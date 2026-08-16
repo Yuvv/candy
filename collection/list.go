@@ -1,16 +1,15 @@
-package lists
+package collection
 
 import (
-	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 	"github.com/yuvv/candy/lang"
 )
 
 type List[E any] interface {
-	collections.Collection[E]
+	Collection[E]
 
-	AddAllAt(idx int, collection collections.Collection[E])
+	AddAllAt(idx int, collection Collection[E])
 
 	ReplaceAll(operator function.UnaryOperator[E])
 
@@ -28,9 +27,9 @@ type List[E any] interface {
 
 	LastIndexOf(o E) int
 
-	ListIterator() iters.ListIterator[E]
+	ListIterator() iter.ListIterator[E]
 
-	ListIteratorFrom(idx int) iters.ListIterator[E]
+	ListIteratorFrom(idx int) iter.ListIterator[E]
 
 	SubList(fromIdx, toIdx int) List[E]
 
@@ -38,14 +37,14 @@ type List[E any] interface {
 }
 
 type AbstractList[E any] struct {
-	collections.AbstractCollection[E]
+	AbstractCollection[E]
 
 	modCount int
 
 	equalMethod func(x E, other any) bool
 }
 
-func (a *AbstractList[E]) Iterator() iters.Iterator[E] {
+func (a *AbstractList[E]) Iterator() iter.Iterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -55,7 +54,7 @@ func (a *AbstractList[E]) ForEach(action function.Consumer[E]) {
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) Spliterator() iters.Spliterator[E] {
+func (a *AbstractList[E]) Spliterator() iter.Spliterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -80,17 +79,17 @@ func (a *AbstractList[E]) Remove(o E) bool {
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) ContainsAll(collection collections.Collection[E]) bool {
+func (a *AbstractList[E]) ContainsAll(collection Collection[E]) bool {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) AddAll(collection collections.Collection[E]) bool {
+func (a *AbstractList[E]) AddAll(collection Collection[E]) bool {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) RemoveAll(collection collections.Collection[E]) bool {
+func (a *AbstractList[E]) RemoveAll(collection Collection[E]) bool {
 	//TODO implement me
 	panic("implement me")
 }
@@ -100,12 +99,12 @@ func (a *AbstractList[E]) RemoveIf(predicate function.Predicate[E]) bool {
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) RetainAll(collection collections.Collection[E]) bool {
+func (a *AbstractList[E]) RetainAll(collection Collection[E]) bool {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) AddAllAt(idx int, collection collections.Collection[E]) {
+func (a *AbstractList[E]) AddAllAt(idx int, collection Collection[E]) {
 	//TODO implement me
 	panic("implement me")
 }
@@ -160,12 +159,12 @@ func (a *AbstractList[E]) LastIndexOf(o E) int {
 	return -1
 }
 
-func (a *AbstractList[E]) ListIterator() iters.ListIterator[E] {
+func (a *AbstractList[E]) ListIterator() iter.ListIterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (a *AbstractList[E]) ListIteratorFrom(idx int) iters.ListIterator[E] {
+func (a *AbstractList[E]) ListIteratorFrom(idx int) iter.ListIterator[E] {
 	//TODO implement me
 	panic("implement me")
 }

@@ -2,85 +2,128 @@ package optional
 
 import "testing"
 
-func TestOptional_Get(t *testing.T) {
-	t.Run("PanicForNillable-Init", func(t *testing.T) {
-		defer func() {
-			if err := recover(); err == nil {
-				t.Errorf("should panic")
-			}
-		}()
+func TestEmptyAndOfPresenceAndGet(t *testing.T) {
+	var empty Optional[int] = Empty[int]()
+	if !empty.IsEmpty() {
+		t.Fatalf("Empty should be empty")
+	}
+	if empty.IsPresent() {
+		t.Fatalf("Empty should not be present")
+	}
 
-		optional := Of[*int](nil)
-		_ = optional.Get()
-	})
-
-	t.Run("GetNillableValue", func(t *testing.T) {
-		optional := OfNillable[*int](nil)
-		res := optional.Get()
-		if res != nil {
-			t.Fatalf("should return nil, got:%+v", res)
-		}
-
-		optional2 := OfNillable[*string](&[]string{"abc"}[0])
-		res2 := optional2.Get()
-		if res2 == nil || *res2 != "abc" {
-			t.Fatalf("should return `abc`, got:%+v", res2)
-		}
-	})
-
-	t.Run("GetNonNillableValue", func(t *testing.T) {
-		optional := Of[int](1)
-		res := optional.Get()
-		if res != 1 {
-			t.Fatalf("should return 1, got:%d", res)
-		}
-
-		optional2 := Of[float64](1.3e7)
-		res2 := optional2.Get()
-		if res2 != 1.3e7 {
-			t.Fatalf("should return 1.3e7, got:%f", res2)
-		}
-	})
+	var present Optional[int] = Of(0)
+	if !present.IsPresent() {
+		t.Fatalf("Of should be present")
+	}
+	if present.IsEmpty() {
+		t.Fatalf("Of should not be empty")
+	}
+	if got := present.Get(); got != 0 {
+		t.Fatalf("Get() = %d, want 0", got)
+	}
 }
 
-func TestOptional_IsEmpty(t *testing.T) {
-	t.Run("NillableEmpty", func(t *testing.T) {
-		optional := Empty[*int]()
-		if !optional.IsEmpty() {
-			t.Fatalf("Empty Optional should be empty")
+func TestGetPanicsOnEmpty(t *testing.T) {
+	defer func() {
+		got := recover()
+		if got == nil {
+			t.Fatalf("Get should panic on empty")
 		}
+		if got != "optional: no value present" {
+			t.Fatalf("panic = %v, want %q", got, "optional: no value present")
+		}
+	}()
 
-		optional2 := Empty[[]string]()
-		if !optional2.IsEmpty() {
-			t.Fatalf("Empty Optional should be empty")
-		}
-	})
-
-	t.Run("NonNillableEmpty", func(t *testing.T) {
-		optional := Empty[int64]()
-		if !optional.IsEmpty() {
-			t.Fatalf("Empty Optional should be empty")
-		}
-
-		optional2 := Empty[bool]()
-		if !optional2.IsEmpty() {
-			t.Fatalf("Empty Optional should be empty")
-		}
-	})
+	_ = Empty[string]().Get()
 }
 
-func TestOptional_OrElse(t *testing.T) {
-	t.Run("NillableOrElse", func(t *testing.T) {
-		optional := OfNillable[[]int](nil)
-		res := optional.OrElse([]int{1})
-		if len(res) != 1 || res[0] != 1 {
-			t.Fatalf("should return [1], got: %+v", res)
-		}
+func TestOrElseAndOrElseGet(t *testing.T) {
+	empty := Empty[string]()
+	if got := empty.OrElse("fallback"); got != "fallback" {
+		t.Fatalf("empty.OrElse() = %q, want fallback", got)
+	}
 
-		optional2 := OfNillable[[]string]([]string{"1-1"})
-		res2 := optional2.OrElse([]string{"test"})
-		if len(res2) != 1 || res2[0] != "1-1" {
-			t.Fatalf("should return \"1-1\", got: %s", res2)
-		}
+	present := Of("value")
+	if got := present.OrElse("fallback"); got != "value" {
+		t.Fatalf("present.OrElse() = %q, want value", got)
+	}
+
+	calls := 0
+	if got := empty.OrElseGet(func() string {
+		calls++
+		return "generated"
+	}); got != "generated" {
+		t.Fatalf("empty.OrElseGet() = %q, want generated", got)
+	}
+	if calls != 1 {
+		t.Fatalf("empty supplier calls = %d, want 1", calls)
+	}
+
+	if got := present.OrElseGet(func() string {
+		calls++
+		return "unused"
+	}); got != "value" {
+		t.Fatalf("present.OrElseGet() = %q, want value", got)
+	}
+	if calls != 1 {
+		t.Fatalf("present supplier calls = %d, want still 1", calls)
+	}
+}
+
+func TestIfPresentNotCalledOnEmpty(t *testing.T) {
+	called := false
+	Empty[int]().IfPresent(func(value int) {
+		called = true
 	})
+	if called {
+		t.Fatalf("IfPresent should not call consumer for empty optional")
+	}
+
+	var got int
+	Of(42).IfPresent(func(value int) {
+		got = value
+	})
+	if got != 42 {
+		t.Fatalf("IfPresent got %d, want 42", got)
+	}
+}
+
+func TestMap(t *testing.T) {
+	empty := Map(Empty[int](), func(value int) string {
+		t.Fatalf("mapper should not be called for empty optional")
+		return ""
+	})
+	if !empty.IsEmpty() {
+		t.Fatalf("Map should keep empty optional empty")
+	}
+
+	present := Map(Of(21), func(value int) string {
+		return "value"
+	})
+	if !present.IsPresent() {
+		t.Fatalf("Map should return present optional for present input")
+	}
+	if got := present.Get(); got != "value" {
+		t.Fatalf("mapped value = %q, want value", got)
+	}
+}
+
+func TestFlatMap(t *testing.T) {
+	empty := FlatMap(Empty[int](), func(value int) Optional[string] {
+		t.Fatalf("mapper should not be called for empty optional")
+		return Of("")
+	})
+	if !empty.IsEmpty() {
+		t.Fatalf("FlatMap should keep empty optional empty")
+	}
+
+	present := FlatMap(Of(21), func(value int) Optional[string] {
+		return Of("mapped")
+	})
+	if !present.IsPresent() {
+		t.Fatalf("FlatMap should return present optional for present input")
+	}
+	if got := present.Get(); got != "mapped" {
+		t.Fatalf("flat mapped value = %q, want mapped", got)
+	}
 }

@@ -1,15 +1,14 @@
-package sets
+package collection
 
 import (
 	"reflect"
 
-	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 )
 
 type HashSet[E comparable] struct {
-	collections.AbstractCollection[E]
+	AbstractCollection[E]
 
 	set map[E]bool
 }
@@ -18,7 +17,7 @@ type hashsetIter struct {
 	// todo:
 }
 
-func (h *HashSet[E]) Iterator() iters.Iterator[E] {
+func (h *HashSet[E]) Iterator() iter.Iterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -29,7 +28,7 @@ func (h *HashSet[E]) ForEach(action function.Consumer[E]) {
 	}
 }
 
-func (h *HashSet[E]) Spliterator() iters.Spliterator[E] {
+func (h *HashSet[E]) Spliterator() iter.Spliterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -72,7 +71,7 @@ func (h *HashSet[E]) Remove(o E) bool {
 	return false
 }
 
-func (h *HashSet[E]) ContainsAll(collection collections.Collection[E]) bool {
+func (h *HashSet[E]) ContainsAll(collection Collection[E]) bool {
 	it := collection.Iterator()
 	for it.HasNext() {
 		_, ok := h.set[it.Next()]
@@ -83,7 +82,7 @@ func (h *HashSet[E]) ContainsAll(collection collections.Collection[E]) bool {
 	return true
 }
 
-func (h *HashSet[E]) AddAll(collection collections.Collection[E]) bool {
+func (h *HashSet[E]) AddAll(collection Collection[E]) bool {
 	modified := false
 	it := collection.Iterator()
 	for it.HasNext() {
@@ -93,7 +92,7 @@ func (h *HashSet[E]) AddAll(collection collections.Collection[E]) bool {
 	return modified
 }
 
-func (h *HashSet[E]) RemoveAll(collection collections.Collection[E]) bool {
+func (h *HashSet[E]) RemoveAll(collection Collection[E]) bool {
 	modified := false
 	it := collection.Iterator()
 	for it.HasNext() {
@@ -118,7 +117,7 @@ func (h *HashSet[E]) RemoveIf(predicate function.Predicate[E]) bool {
 	return modified
 }
 
-func (h *HashSet[E]) RetainAll(collection collections.Collection[E]) bool {
+func (h *HashSet[E]) RetainAll(collection Collection[E]) bool {
 	modified := false
 	for k := range h.set {
 		if !collection.Contains(k) {
@@ -134,16 +133,6 @@ func (h *HashSet[E]) Clear() {
 		delete(h.set, k)
 	}
 }
-
-//func (h *HashSet[E]) Stream() stream.Stream[E] {
-//	//TODO implement me
-//	panic("implement me")
-//}
-//
-//func (h *HashSet[E]) ParallelStream() stream.Stream[E] {
-//	//TODO implement me
-//	panic("implement me")
-//}
 
 /// ---------------------------------------------------------------------------
 

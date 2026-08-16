@@ -1,11 +1,10 @@
-package lists
+package collection
 
 import (
 	"sort"
 
-	"github.com/yuvv/candy/collections"
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 	"github.com/yuvv/candy/lang"
 )
 
@@ -15,7 +14,7 @@ type _ArrayList[E any] struct {
 	slice []E
 }
 
-func (lst *_ArrayList[E]) Iterator() iters.Iterator[E] {
+func (lst *_ArrayList[E]) Iterator() iter.Iterator[E] {
 	return NewItr[E](lst)
 }
 
@@ -25,7 +24,7 @@ func (lst *_ArrayList[E]) ForEach(action function.Consumer[E]) {
 	}
 }
 
-func (lst *_ArrayList[E]) Spliterator() iters.Spliterator[E] {
+func (lst *_ArrayList[E]) Spliterator() iter.Spliterator[E] {
 	//TODO implement me
 	panic("implement me")
 }
@@ -75,7 +74,7 @@ func (lst *_ArrayList[E]) Remove(o E) bool {
 	return false
 }
 
-func (lst *_ArrayList[E]) ContainsAll(collection collections.Collection[E]) bool {
+func (lst *_ArrayList[E]) ContainsAll(collection Collection[E]) bool {
 	it := collection.Iterator()
 	for it.HasNext() {
 		if !lst.Contains(it.Next()) {
@@ -85,7 +84,7 @@ func (lst *_ArrayList[E]) ContainsAll(collection collections.Collection[E]) bool
 	return true
 }
 
-func (lst *_ArrayList[E]) AddAll(collection collections.Collection[E]) bool {
+func (lst *_ArrayList[E]) AddAll(collection Collection[E]) bool {
 	lst.modCount++
 	modified := false
 	it := collection.Iterator()
@@ -95,7 +94,7 @@ func (lst *_ArrayList[E]) AddAll(collection collections.Collection[E]) bool {
 	return modified
 }
 
-func (lst *_ArrayList[E]) RemoveAll(collection collections.Collection[E]) bool {
+func (lst *_ArrayList[E]) RemoveAll(collection Collection[E]) bool {
 	return lst.RemoveIf(collection.Contains)
 }
 
@@ -115,7 +114,7 @@ func (lst *_ArrayList[E]) RemoveIf(predicate function.Predicate[E]) bool {
 	return true
 }
 
-func (lst *_ArrayList[E]) RetainAll(collection collections.Collection[E]) bool {
+func (lst *_ArrayList[E]) RetainAll(collection Collection[E]) bool {
 	modified := false
 	it := lst.Iterator()
 	for it.HasNext() {
@@ -132,7 +131,7 @@ func (lst *_ArrayList[E]) Clear() {
 	lst.slice = lst.slice[:0]
 }
 
-func (lst *_ArrayList[E]) AddAllAt(idx int, collection collections.Collection[E]) {
+func (lst *_ArrayList[E]) AddAllAt(idx int, collection Collection[E]) {
 	lst.modCount++
 	nSlice := make([]E, len(lst.slice)+collection.Size())
 	i := 0
@@ -213,11 +212,11 @@ func (lst *_ArrayList[E]) LastIndexOf(o E) int {
 	return -1
 }
 
-func (lst *_ArrayList[E]) ListIterator() iters.ListIterator[E] {
+func (lst *_ArrayList[E]) ListIterator() iter.ListIterator[E] {
 	return NewListItr[E](lst)
 }
 
-func (lst *_ArrayList[E]) ListIteratorFrom(idx int) iters.ListIterator[E] {
+func (lst *_ArrayList[E]) ListIteratorFrom(idx int) iter.ListIterator[E] {
 	return NewListItrFrom[E](lst, idx)
 }
 

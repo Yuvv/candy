@@ -2,14 +2,14 @@ package stream
 
 import (
 	"github.com/yuvv/candy/function"
-	"github.com/yuvv/candy/iters"
+	"github.com/yuvv/candy/iter"
 )
 
 type _ReferencePipeline[PIN, POUT any] struct {
 	_AbstractPipeline[PIN, POUT, Stream[POUT]]
 }
 
-func (receiver _ReferencePipeline[EIN, EOUT]) sourceStageSpliterator() iters.Spliterator[EOUT] {
+func (receiver _ReferencePipeline[EIN, EOUT]) sourceStageSpliterator() iter.Spliterator[EOUT] {
 	// todo
 	return nil
 }
