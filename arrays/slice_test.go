@@ -37,6 +37,20 @@ func TestFilterRejectInPlace(t *testing.T) {
 	}
 }
 
+func TestFilterInPlaceClearsDiscardedTail(t *testing.T) {
+	a, b, c := 1, 2, 3
+	items := []*int{&a, &b, &c}
+
+	got := FilterInPlace(items, func(v *int) bool { return v != &b })
+
+	if !reflect.DeepEqual(got, []*int{&a, &c}) {
+		t.Fatalf("FilterInPlace pointers = %#v", got)
+	}
+	if items[2] != nil {
+		t.Fatalf("FilterInPlace should clear discarded tail reference, got %v", *items[2])
+	}
+}
+
 func TestRemoveZero(t *testing.T) {
 	items := []string{"", "a", "", "b"}
 	if got := RemoveZero(items); !reflect.DeepEqual(got, []string{"a", "b"}) {

@@ -25,6 +25,12 @@ func FilterInPlace[T any](items []T, keep func(T) bool) []T {
 			filtered = append(filtered, item)
 		}
 	}
+
+	var zero T
+	for i := len(filtered); i < len(items); i++ {
+		items[i] = zero
+	}
+
 	return filtered
 }
 
