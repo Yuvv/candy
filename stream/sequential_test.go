@@ -111,6 +111,81 @@ func TestCount(t *testing.T) {
 	}
 }
 
+func TestAnyMatch(t *testing.T) {
+	isEven := function.Predicate[int](func(value int) bool { return value%2 == 0 })
+
+	if !Of(1, 2, 3).AnyMatch(isEven) {
+		t.Fatal("AnyMatch() = false, want true for matching stream")
+	}
+	if Of(1, 3, 5).AnyMatch(isEven) {
+		t.Fatal("AnyMatch() = true, want false for non-matching stream")
+	}
+	if Empty[int]().AnyMatch(isEven) {
+		t.Fatal("empty AnyMatch() = true, want false")
+	}
+
+	calls := 0
+	if !Of(1, 2, 4).AnyMatch(func(value int) bool {
+		calls++
+		return value%2 == 0
+	}) {
+		t.Fatal("AnyMatch() = false, want true")
+	}
+	if calls != 2 {
+		t.Fatalf("AnyMatch() predicate calls = %d, want 2", calls)
+	}
+}
+
+func TestAllMatch(t *testing.T) {
+	isEven := function.Predicate[int](func(value int) bool { return value%2 == 0 })
+
+	if !Of(2, 4, 6).AllMatch(isEven) {
+		t.Fatal("AllMatch() = false, want true for matching stream")
+	}
+	if Of(2, 3, 4).AllMatch(isEven) {
+		t.Fatal("AllMatch() = true, want false for non-matching stream")
+	}
+	if !Empty[int]().AllMatch(isEven) {
+		t.Fatal("empty AllMatch() = false, want true")
+	}
+
+	calls := 0
+	if Of(2, 3, 4).AllMatch(func(value int) bool {
+		calls++
+		return value%2 == 0
+	}) {
+		t.Fatal("AllMatch() = true, want false")
+	}
+	if calls != 2 {
+		t.Fatalf("AllMatch() predicate calls = %d, want 2", calls)
+	}
+}
+
+func TestNoneMatch(t *testing.T) {
+	isEven := function.Predicate[int](func(value int) bool { return value%2 == 0 })
+
+	if !Of(1, 3, 5).NoneMatch(isEven) {
+		t.Fatal("NoneMatch() = false, want true for non-matching stream")
+	}
+	if Of(1, 2, 3).NoneMatch(isEven) {
+		t.Fatal("NoneMatch() = true, want false for matching stream")
+	}
+	if !Empty[int]().NoneMatch(isEven) {
+		t.Fatal("empty NoneMatch() = false, want true")
+	}
+
+	calls := 0
+	if Of(1, 2, 4).NoneMatch(func(value int) bool {
+		calls++
+		return value%2 == 0
+	}) {
+		t.Fatal("NoneMatch() = true, want false")
+	}
+	if calls != 2 {
+		t.Fatalf("NoneMatch() predicate calls = %d, want 2", calls)
+	}
+}
+
 func TestFindFirstAndFindAny(t *testing.T) {
 	stream := Of(7, 8, 9)
 	if got := stream.FindFirst(); !got.IsPresent() || got.Get() != 7 {

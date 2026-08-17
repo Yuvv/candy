@@ -114,15 +114,30 @@ func (stream sequentialStream[T]) Count() int64 {
 }
 
 func (stream sequentialStream[T]) AnyMatch(predicate function.Predicate[T]) bool {
-	panic("stream: AnyMatch is not implemented")
+	for _, value := range stream.values {
+		if predicate(value) {
+			return true
+		}
+	}
+	return false
 }
 
 func (stream sequentialStream[T]) AllMatch(predicate function.Predicate[T]) bool {
-	panic("stream: AllMatch is not implemented")
+	for _, value := range stream.values {
+		if !predicate(value) {
+			return false
+		}
+	}
+	return true
 }
 
 func (stream sequentialStream[T]) NoneMatch(predicate function.Predicate[T]) bool {
-	panic("stream: NoneMatch is not implemented")
+	for _, value := range stream.values {
+		if predicate(value) {
+			return false
+		}
+	}
+	return true
 }
 
 func (stream sequentialStream[T]) FindFirst() optional.Optional[T] {
