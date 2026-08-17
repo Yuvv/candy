@@ -104,13 +104,20 @@ type Stream[T any] interface {
 
 // Of func
 func Of[T any](values ...T) Stream[T] {
-	panic("stream: Of is not implemented")
+	return newSequentialStream(values)
 }
 
 func Empty[T any]() Stream[T] {
-	panic("stream: Empty is not implemented")
+	return newSequentialStream([]T(nil))
 }
 
 func Concat[T any](a, b Stream[T]) Stream[T] {
-	panic("stream: Concat is not implemented")
+	var values []T
+	if a != nil {
+		values = append(values, a.ToArray()...)
+	}
+	if b != nil {
+		values = append(values, b.ToArray()...)
+	}
+	return newSequentialStream(values)
 }
