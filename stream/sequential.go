@@ -1,6 +1,9 @@
 package stream
 
 import (
+	"reflect"
+	"sort"
+
 	"github.com/yuvv/candy/function"
 	"github.com/yuvv/candy/lang"
 	"github.com/yuvv/candy/optional"
@@ -17,31 +20,93 @@ func newSequentialStream[T any](values []T) Stream[T] {
 }
 
 func (stream sequentialStream[T]) Filter(predicate function.Predicate[T]) Stream[T] {
-	panic("stream: Filter is not implemented")
+	values := make([]T, 0, len(stream.values))
+	for _, value := range stream.values {
+		if predicate(value) {
+			values = append(values, value)
+		}
+	}
+	return newSequentialStream(values)
 }
 
 func (stream sequentialStream[T]) Distinct() Stream[T] {
-	panic("stream: Distinct is not implemented")
+	values := make([]T, 0, len(stream.values))
+	for _, value := range stream.values {
+		distinct := true
+		for _, existing := range values {
+			if reflect.DeepEqual(value, existing) {
+				distinct = false
+				break
+			}
+		}
+		if distinct {
+			values = append(values, value)
+		}
+	}
+	return newSequentialStream(values)
 }
 
 func (stream sequentialStream[T]) Sorted() Stream[T] {
-	panic("stream: Sorted is not implemented")
+	kind := reflect.TypeOf((*T)(nil)).Elem().Kind()
+	switch kind {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64, reflect.String:
+	default:
+		panic("stream: Sorted requires an ordered element type")
+	}
+
+	values := stream.ToArray()
+	sort.SliceStable(values, func(i, j int) bool {
+		left := reflect.ValueOf(values[i])
+		right := reflect.ValueOf(values[j])
+		switch kind {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			return left.Int() < right.Int()
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			return left.Uint() < right.Uint()
+		case reflect.Float32, reflect.Float64:
+			return left.Float() < right.Float()
+		case reflect.String:
+			return left.String() < right.String()
+		}
+		return false
+	})
+	return newSequentialStream(values)
 }
 
 func (stream sequentialStream[T]) SortedBy() Stream[T] {
-	panic("stream: SortedBy is not implemented")
+	panic("stream: SortedBy requires a comparator; use stream.SortedBy")
 }
 
 func (stream sequentialStream[T]) Peek(consumer function.Consumer[T]) Stream[T] {
-	panic("stream: Peek is not implemented")
+	for _, value := range stream.values {
+		consumer(value)
+	}
+	return newSequentialStream(stream.values)
 }
 
 func (stream sequentialStream[T]) Skip(n int64) Stream[T] {
-	panic("stream: Skip is not implemented")
+	if n <= 0 {
+		return newSequentialStream(stream.values)
+	}
+	if n >= int64(len(stream.values)) {
+		return Empty[T]()
+	}
+	return newSequentialStream(stream.values[int(n):])
 }
 
 func (stream sequentialStream[T]) Limit(maxSize int64) Stream[T] {
-	panic("stream: Limit is not implemented")
+	if maxSize < 0 {
+		panic("stream: limit size must be non-negative")
+	}
+	if maxSize == 0 {
+		return Empty[T]()
+	}
+	if maxSize >= int64(len(stream.values)) {
+		return newSequentialStream(stream.values)
+	}
+	return newSequentialStream(stream.values[:int(maxSize)])
 }
 
 func (stream sequentialStream[T]) ForEach(consumer function.Consumer[T]) {

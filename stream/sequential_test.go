@@ -199,6 +199,138 @@ func TestFindFirstAndFindAny(t *testing.T) {
 	}
 }
 
+func TestFilterPreservesOrderAndSource(t *testing.T) {
+	source := Of(3, 2, 4, 1)
+	filtered := source.Filter(func(value int) bool { return value%2 == 0 })
+
+	if got, want := filtered.ToArray(), []int{2, 4}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("Filter().ToArray() = %v, want %v", got, want)
+	}
+	if got, want := source.ToArray(), []int{3, 2, 4, 1}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("source after Filter() = %v, want %v", got, want)
+	}
+}
+
+func TestDistinctPreservesFirstOccurrence(t *testing.T) {
+	if got, want := Of(3, 1, 3, 2, 1).Distinct().ToArray(), []int{3, 1, 2}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("Distinct().ToArray() = %v, want %v", got, want)
+	}
+}
+
+func TestDistinctUsesDeepEqualForNonComparableValues(t *testing.T) {
+	type record struct {
+		name string
+		tags []string
+	}
+	values := []record{
+		{name: "first", tags: []string{"a", "b"}},
+		{name: "second", tags: []string{"x"}},
+		{name: "first", tags: []string{"a", "b"}},
+	}
+	want := values[:2]
+	if got := Of(values...).Distinct().ToArray(); !reflect.DeepEqual(got, want) {
+		t.Fatalf("Distinct().ToArray() = %v, want %v", got, want)
+	}
+
+	slices := [][]int{{1, 2}, {3}, {1, 2}}
+	if got, want := Of(slices...).Distinct().ToArray(), slices[:2]; !reflect.DeepEqual(got, want) {
+		t.Fatalf("slice Distinct().ToArray() = %v, want %v", got, want)
+	}
+}
+
+func TestPeekCallsConsumerInOrderAndReturnsIndependentStream(t *testing.T) {
+	source := Of(3, 1, 2)
+	var calls []int
+	peeked := source.Peek(func(value int) { calls = append(calls, value) })
+
+	if want := []int{3, 1, 2}; !reflect.DeepEqual(calls, want) {
+		t.Fatalf("Peek() call order = %v, want %v", calls, want)
+	}
+	if got, want := peeked.ToArray(), []int{3, 1, 2}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("Peek().ToArray() = %v, want %v", got, want)
+	}
+
+	peekedValue := peeked.(sequentialStream[int])
+	peekedValue.values[0] = 99
+	if got, want := source.ToArray(), []int{3, 1, 2}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("source after mutating Peek result = %v, want %v", got, want)
+	}
+}
+
+func TestSkip(t *testing.T) {
+	tests := []struct {
+		name string
+		n    int64
+		want []int
+	}{
+		{name: "negative", n: -1, want: []int{1, 2, 3}},
+		{name: "zero", n: 0, want: []int{1, 2, 3}},
+		{name: "normal", n: 2, want: []int{3}},
+		{name: "equal count", n: 3, want: []int{}},
+		{name: "too large", n: 10, want: []int{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Of(1, 2, 3).Skip(tt.n).ToArray(); !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("Skip(%d).ToArray() = %v, want %v", tt.n, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLimit(t *testing.T) {
+	assertPanicMessage(t, "stream: limit size must be non-negative", func() {
+		Of(1, 2, 3).Limit(-1)
+	})
+
+	tests := []struct {
+		name string
+		n    int64
+		want []int
+	}{
+		{name: "zero", n: 0, want: []int{}},
+		{name: "normal", n: 2, want: []int{1, 2}},
+		{name: "equal count", n: 3, want: []int{1, 2, 3}},
+		{name: "too large", n: 10, want: []int{1, 2, 3}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Of(1, 2, 3).Limit(tt.n).ToArray(); !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("Limit(%d).ToArray() = %v, want %v", tt.n, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSortedOrderedTypesAndSourceUnchanged(t *testing.T) {
+	ints := Of(3, 1, 2)
+	if got, want := ints.Sorted().ToArray(), []int{1, 2, 3}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("int Sorted().ToArray() = %v, want %v", got, want)
+	}
+	if got, want := ints.ToArray(), []int{3, 1, 2}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("int source after Sorted() = %v, want %v", got, want)
+	}
+
+	if got, want := Of("beta", "alpha", "gamma").Sorted().ToArray(), []string{"alpha", "beta", "gamma"}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("string Sorted().ToArray() = %v, want %v", got, want)
+	}
+	if got, want := Of(3.5, -1.0, 2.25).Sorted().ToArray(), []float64{-1.0, 2.25, 3.5}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("float Sorted().ToArray() = %v, want %v", got, want)
+	}
+}
+
+func TestSortedUnsupportedTypePanics(t *testing.T) {
+	assertPanicMessage(t, "stream: Sorted requires an ordered element type", func() {
+		Of(struct{ value int }{value: 1}).Sorted()
+	})
+}
+
+func TestSortedByMethodPanicsWithPackageFunctionGuidance(t *testing.T) {
+	assertPanicMessage(t, "stream: SortedBy requires a comparator; use stream.SortedBy", func() {
+		Of(3, 1, 2).SortedBy()
+	})
+}
+
 func TestMinAndMax(t *testing.T) {
 	stream := Of(4, 2, 9, 1, 7)
 	comparator := intComparator{}
