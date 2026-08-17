@@ -19,24 +19,6 @@ func assertPanicMessage(t *testing.T, want string, fn func()) {
 	fn()
 }
 
-func TestOfPanicsWhenUnimplemented(t *testing.T) {
-	assertPanicMessage(t, "stream: Of is not implemented", func() {
-		Of(1, 2, 3)
-	})
-}
-
-func TestEmptyPanicsWhenUnimplemented(t *testing.T) {
-	assertPanicMessage(t, "stream: Empty is not implemented", func() {
-		Empty[int]()
-	})
-}
-
-func TestConcatPanicsWhenUnimplemented(t *testing.T) {
-	assertPanicMessage(t, "stream: Concat is not implemented", func() {
-		Concat[int](nil, nil)
-	})
-}
-
 func TestSupportBySpliteratorPanicsWhenUnimplemented(t *testing.T) {
 	assertPanicMessage(t, "stream: SupportBySpliterator is not implemented", func() {
 		SupportBySpliterator[int](nil, false)
