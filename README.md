@@ -12,10 +12,16 @@ Go utility packages for common application code.
 - dates: date/time boundaries, parsing, and formatting.
 - encoding/jsontypes: adaptive JSON bool and number types.
 - types: lightweight type helpers such as bit flags and bitmaps.
+- stream: sequential stream helpers for eager, slice-backed pipelines.
 
-The repository also contains earlier experimental Java-style collection and stream packages. New utility packages are designed to be independent and practical for normal Go code.
+The repository also contains the earlier experimental Java-style collection package. New utility packages are designed to be independent and practical for normal Go code.
 
 ## Examples
+
+```go
+values := stream.Map(stream.Of(1, 2, 3), strconv.Itoa).ToArray()
+fmt.Println(values) // [1 2 3]
+```
 
 ```go
 start := dates.BeginOfDay(time.Date(2024, 5, 6, 15, 4, 5, 0, time.UTC))
