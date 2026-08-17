@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"math"
 	"reflect"
 	"sort"
 
@@ -66,7 +67,17 @@ func (stream sequentialStream[T]) Sorted() Stream[T] {
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 			return left.Uint() < right.Uint()
 		case reflect.Float32, reflect.Float64:
-			return left.Float() < right.Float()
+			leftFloat := left.Float()
+			rightFloat := right.Float()
+			leftNaN := math.IsNaN(leftFloat)
+			rightNaN := math.IsNaN(rightFloat)
+			if leftNaN {
+				return false
+			}
+			if rightNaN {
+				return true
+			}
+			return leftFloat < rightFloat
 		case reflect.String:
 			return left.String() < right.String()
 		}

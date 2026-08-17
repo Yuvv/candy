@@ -44,7 +44,7 @@ func SortedBy[T any](s Stream[T], less func(a, b T) bool) Stream[T] {
 	source := s.ToArray()
 	values := make([]T, len(source))
 	copy(values, source)
-	sort.Slice(values, func(i, j int) bool {
+	sort.SliceStable(values, func(i, j int) bool {
 		return less(values[i], values[j])
 	})
 	return newSequentialStream(values)

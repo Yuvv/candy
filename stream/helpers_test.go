@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -65,6 +66,32 @@ func TestSortedBySortsCustomStructWithoutChangingSource(t *testing.T) {
 	}
 	if got := source.ToArray(); !reflect.DeepEqual(got, sourceValues) {
 		t.Fatalf("source after SortedBy() = %v, want %v", got, sourceValues)
+	}
+}
+
+func TestSortedByPreservesEqualKeyOrder(t *testing.T) {
+	type item struct {
+		group int
+		name  string
+	}
+
+	values := make([]item, 0, 40)
+	want := make([]item, 0, 40)
+	for i := 0; i < 20; i++ {
+		values = append(values,
+			item{group: 2, name: fmt.Sprintf("second-%02d", i)},
+			item{group: 1, name: fmt.Sprintf("first-%02d", i)},
+		)
+	}
+	for i := 0; i < 20; i++ {
+		want = append(want, item{group: 1, name: fmt.Sprintf("first-%02d", i)})
+	}
+	for i := 0; i < 20; i++ {
+		want = append(want, item{group: 2, name: fmt.Sprintf("second-%02d", i)})
+	}
+	got := SortedBy(Of(values...), func(a, b item) bool { return a.group < b.group }).ToArray()
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("SortedBy().ToArray() = %v, want stable order %v", got, want)
 	}
 }
 

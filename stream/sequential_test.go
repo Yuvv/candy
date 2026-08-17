@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
@@ -316,6 +317,32 @@ func TestSortedOrderedTypesAndSourceUnchanged(t *testing.T) {
 	}
 	if got, want := Of(3.5, -1.0, 2.25).Sorted().ToArray(), []float64{-1.0, 2.25, 3.5}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("float Sorted().ToArray() = %v, want %v", got, want)
+	}
+}
+
+func TestSortedFloat64PlacesNaNsLast(t *testing.T) {
+	firstNaN := math.Float64frombits(0x7ff8000000000001)
+	secondNaN := math.Float64frombits(0x7ff8000000000002)
+	got := Of(firstNaN, -1.0, secondNaN, 0.0, 2.0).Sorted().ToArray()
+	if want := []float64{-1, 0, 2}; !reflect.DeepEqual(got[:3], want) {
+		t.Fatalf("Sorted().ToArray() numeric values = %v, want %v", got[:3], want)
+	}
+	if !math.IsNaN(got[3]) || !math.IsNaN(got[4]) {
+		t.Fatalf("Sorted().ToArray() trailing values = %v, want NaNs", got[3:])
+	}
+	if gotBits, wantBits := []uint64{math.Float64bits(got[3]), math.Float64bits(got[4])}, []uint64{math.Float64bits(firstNaN), math.Float64bits(secondNaN)}; !reflect.DeepEqual(gotBits, wantBits) {
+		t.Fatalf("Sorted().ToArray() NaN order = %x, want stable order %x", gotBits, wantBits)
+	}
+}
+
+func TestSortedFloat32PlacesNaNsLast(t *testing.T) {
+	nan := float32(math.NaN())
+	got := Of(nan, float32(-1), float32(0), float32(2)).Sorted().ToArray()
+	if want := []float32{-1, 0, 2}; !reflect.DeepEqual(got[:3], want) {
+		t.Fatalf("Sorted().ToArray() numeric values = %v, want %v", got[:3], want)
+	}
+	if !math.IsNaN(float64(got[3])) {
+		t.Fatalf("Sorted().ToArray() last value = %v, want NaN", got[3])
 	}
 }
 
