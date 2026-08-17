@@ -1,6 +1,10 @@
 package collection
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 func TestCollection(t *testing.T) {
 	list := NewArrayList[int]()
@@ -137,4 +141,136 @@ func Test_ArrayList_AddAt(t *testing.T) {
 		}
 	}
 
+}
+
+func assertPanicsWithIndex(t *testing.T, wantIdx int, action func()) {
+	t.Helper()
+	defer func() {
+		recovered := recover()
+		if recovered == nil {
+			t.Fatal("expected panic")
+		}
+		message := fmt.Sprint(recovered)
+		if !strings.Contains(message, "index") || !strings.Contains(message, fmt.Sprint(wantIdx)) {
+			t.Fatalf("panic %q should clearly identify invalid index %d", message, wantIdx)
+		}
+	}()
+	action()
+}
+
+func pointerList(values ...*int) *_ArrayList[*int] {
+	return NewSpecArrayListWithEle(func(a *int, o any) bool {
+		other, ok := o.(*int)
+		return ok && a == other
+	}, values...)
+}
+
+func assertDiscardedPointersCleared(t *testing.T, lst *_ArrayList[*int]) {
+	t.Helper()
+	full := lst.slice[:cap(lst.slice)]
+	for i := len(lst.slice); i < len(full); i++ {
+		if full[i] != nil {
+			t.Fatalf("discarded slot %d retains pointer %p", i, full[i])
+		}
+	}
+}
+
+func Test_ArrayList_AddAtEmptyAndAppend(t *testing.T) {
+	lst := NewArrayList[int]()
+	lst.AddAt(0, 1)
+	lst.AddAt(lst.Size(), 2)
+
+	if got := lst.ToArray(); len(got) != 2 || got[0] != 1 || got[1] != 2 {
+		t.Fatalf("AddAt results = %v, want [1 2]", got)
+	}
+}
+
+func Test_ArrayList_AddAtRejectsInvalidIndex(t *testing.T) {
+	for _, idx := range []int{-1, 2} {
+		t.Run(fmt.Sprint(idx), func(t *testing.T) {
+			lst := NewArrayListWithEle(1)
+			assertPanicsWithIndex(t, idx, func() { lst.AddAt(idx, 2) })
+		})
+	}
+}
+
+func Test_ArrayList_RemoveAtRejectsInvalidIndex(t *testing.T) {
+	for _, idx := range []int{-1, 1} {
+		t.Run(fmt.Sprint(idx), func(t *testing.T) {
+			lst := NewArrayListWithEle(1)
+			assertPanicsWithIndex(t, idx, func() { lst.RemoveAt(idx) })
+		})
+	}
+}
+
+func Test_ArrayList_RemovalsClearDiscardedPointerSlots(t *testing.T) {
+	t.Run("Remove", func(t *testing.T) {
+		a, b, c := 1, 2, 3
+		lst := pointerList(&a, &b, &c)
+		lst.Remove(&b)
+		assertDiscardedPointersCleared(t, lst)
+	})
+
+	t.Run("RemoveAt", func(t *testing.T) {
+		a, b, c := 1, 2, 3
+		lst := pointerList(&a, &b, &c)
+		lst.RemoveAt(0)
+		assertDiscardedPointersCleared(t, lst)
+	})
+
+	t.Run("RemoveIf", func(t *testing.T) {
+		a, b, c, d := 1, 2, 3, 4
+		lst := pointerList(&a, &b, &c, &d)
+		lst.RemoveIf(func(value *int) bool { return *value%2 == 0 })
+		assertDiscardedPointersCleared(t, lst)
+	})
+
+	t.Run("Clear", func(t *testing.T) {
+		a, b, c := 1, 2, 3
+		lst := pointerList(&a, &b, &c)
+		lst.Clear()
+		assertDiscardedPointersCleared(t, lst)
+	})
+}
+
+func Test_ArrayList_AddAllAtValidatesIndex(t *testing.T) {
+	for _, idx := range []int{-1, 2} {
+		t.Run(fmt.Sprint(idx), func(t *testing.T) {
+			lst := NewArrayListWithEle(1)
+			assertPanicsWithIndex(t, idx, func() { lst.AddAllAt(idx, NewArrayList[int]()) })
+		})
+	}
+}
+
+func Test_ArrayList_AddAllAtEmptyCollectionDoesNotModify(t *testing.T) {
+	lst := NewArrayListWithEle(1)
+	itr := lst.Iterator()
+
+	lst.AddAllAt(1, NewArrayList[int]())
+
+	if got := itr.Next(); got != 1 {
+		t.Fatalf("iterator returned %d, want 1", got)
+	}
+}
+
+func Test_ArrayList_ClearEmptyDoesNotModify(t *testing.T) {
+	lst := NewArrayList[int]()
+	before := lst.modCount
+
+	lst.Clear()
+
+	if lst.modCount != before {
+		t.Fatalf("Clear modCount = %d, want %d", lst.modCount, before)
+	}
+}
+
+func Test_ArrayList_ClearNonEmptyModifies(t *testing.T) {
+	lst := NewArrayListWithEle(1)
+	before := lst.modCount
+
+	lst.Clear()
+
+	if lst.modCount != before+1 {
+		t.Fatalf("Clear modCount = %d, want %d", lst.modCount, before+1)
+	}
 }

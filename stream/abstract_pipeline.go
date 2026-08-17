@@ -7,14 +7,7 @@ import (
 )
 
 type PipelineHelper[POUT any] interface {
-	//GetSourceShape() StreamShape
-
 	GetStreamAndOpFlags() int
-
-	// todo: @yuvv
-	//ExactOutputSizeIfKnown[PIN any](spliterator iter.Spliterator[PIN])
-
-	// todo: others
 }
 
 type _AbstractPipeline[EIN, EOUT any, S Stream[EOUT]] struct {

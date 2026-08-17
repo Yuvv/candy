@@ -57,16 +57,10 @@ type Collector[T, A, R any] interface {
 
 // Stream interface
 type Stream[T any] interface {
-	// todo: @yuvv
-	// BaseStream[T, Stream[T]]
+	// Go 1.18 does not support generic methods, so map and flat-map style
+	// operations are not represented here.
 
 	Filter(predicate function.Predicate[T]) Stream[T]
-
-	// todo: @yuvv
-	//Map[T, R any](mapper function.Function[T, R]) Stream[R]
-
-	// todo: @yuvv
-	//FlatMap[T, R any](mapper function.Function[T, Stream[R]]) Stream[R]
 
 	Distinct() Stream[T]
 
@@ -89,12 +83,6 @@ type Stream[T any] interface {
 
 	ReduceWithIdentity(identity T, accumulator function.BinaryOperator[T]) T
 
-	// todo: @yuvv
-	//CollectBySupplier[T, R any](supplier function.Supplier[R], consumer function.BiConsumer[R, T], biConsumer function.BiConsumer[R, R]) R
-
-	// todo: @yuvv
-	//Collect[T, A, R any](collector Collector[T, A, R]) R
-
 	Min(comparator lang.Comparator[T]) optional.Optional[T]
 
 	Max(comparator lang.Comparator[T]) optional.Optional[T]
@@ -116,16 +104,13 @@ type Stream[T any] interface {
 
 // Of func
 func Of[T any](values ...T) Stream[T] {
-	// todo:
-	return nil
+	panic("stream: Of is not implemented")
 }
 
 func Empty[T any]() Stream[T] {
-	// todo:
-	return nil
+	panic("stream: Empty is not implemented")
 }
 
 func Concat[T any](a, b Stream[T]) Stream[T] {
-	// todo:
-	return nil
+	panic("stream: Concat is not implemented")
 }

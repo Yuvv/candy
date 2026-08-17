@@ -6,11 +6,9 @@ import (
 )
 
 func SupportBySpliterator[T any](spliterator jogu.Spliterator[T], parallel bool) Stream[T] {
-	// todo:
-	return nil
+	panic("stream: SupportBySpliterator is not implemented")
 }
 
 func SupportBySupplier[T any](supplier function.Supplier[jogu.Spliterator[T]], characteristics Characteristics, parallel bool) Stream[T] {
-	// todo:
-	return nil
+	panic("stream: SupportBySupplier is not implemented")
 }

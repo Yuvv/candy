@@ -1,6 +1,7 @@
 package collection
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/yuvv/candy/function"
@@ -25,8 +26,7 @@ func (lst *_ArrayList[E]) ForEach(action function.Consumer[E]) {
 }
 
 func (lst *_ArrayList[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: ArrayList.Spliterator is unsupported")
 }
 
 func (lst *_ArrayList[E]) Size() int {
@@ -63,9 +63,9 @@ func (lst *_ArrayList[E]) Add(e E) bool {
 func (lst *_ArrayList[E]) Remove(o E) bool {
 	for i, item := range lst.slice {
 		if lst.equalMethod(item, o) {
-			for j := i + 1; j < len(lst.slice); j++ {
-				lst.slice[j-1] = lst.slice[j]
-			}
+			copy(lst.slice[i:], lst.slice[i+1:])
+			var zero E
+			lst.slice[len(lst.slice)-1] = zero
 			lst.slice = lst.slice[:len(lst.slice)-1]
 			lst.modCount++
 			return true
@@ -109,6 +109,10 @@ func (lst *_ArrayList[E]) RemoveIf(predicate function.Predicate[E]) bool {
 	if i >= len(lst.slice) {
 		return false
 	}
+	var zero E
+	for j := i; j < len(lst.slice); j++ {
+		lst.slice[j] = zero
+	}
 	lst.slice = lst.slice[:i]
 	lst.modCount++
 	return true
@@ -127,11 +131,24 @@ func (lst *_ArrayList[E]) RetainAll(collection Collection[E]) bool {
 }
 
 func (lst *_ArrayList[E]) Clear() {
-	lst.modCount++
+	if len(lst.slice) == 0 {
+		return
+	}
+	var zero E
+	for i := range lst.slice {
+		lst.slice[i] = zero
+	}
 	lst.slice = lst.slice[:0]
+	lst.modCount++
 }
 
 func (lst *_ArrayList[E]) AddAllAt(idx int, collection Collection[E]) {
+	if idx < 0 || idx > len(lst.slice) {
+		panic(fmt.Sprintf("index %d out of bounds for size %d", idx, len(lst.slice)))
+	}
+	if collection.Size() == 0 {
+		return
+	}
 	lst.modCount++
 	nSlice := make([]E, len(lst.slice)+collection.Size())
 	i := 0
@@ -176,19 +193,24 @@ func (lst *_ArrayList[E]) Set(idx int, ele E) E {
 }
 
 func (lst *_ArrayList[E]) AddAt(idx int, ele E) {
-	lst.modCount++
-	lst.slice = append(lst.slice, lst.slice[len(lst.slice)-1])
-	for i := len(lst.slice) - 2; i >= idx; i-- {
-		lst.slice[i+1] = lst.slice[i]
+	if idx < 0 || idx > len(lst.slice) {
+		panic(fmt.Sprintf("index %d out of bounds for size %d", idx, len(lst.slice)))
 	}
+	var zero E
+	lst.slice = append(lst.slice, zero)
+	copy(lst.slice[idx+1:], lst.slice[idx:len(lst.slice)-1])
 	lst.slice[idx] = ele
+	lst.modCount++
 }
 
 func (lst *_ArrayList[E]) RemoveAt(idx int) E {
-	origin := lst.slice[idx]
-	for i := idx + 1; i < len(lst.slice); i++ {
-		lst.slice[i-1] = lst.slice[i]
+	if idx < 0 || idx >= len(lst.slice) {
+		panic(fmt.Sprintf("index %d out of bounds for size %d", idx, len(lst.slice)))
 	}
+	origin := lst.slice[idx]
+	copy(lst.slice[idx:], lst.slice[idx+1:])
+	var zero E
+	lst.slice[len(lst.slice)-1] = zero
 	lst.slice = lst.slice[:len(lst.slice)-1]
 	lst.modCount++
 	return origin

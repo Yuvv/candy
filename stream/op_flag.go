@@ -4,7 +4,7 @@ const SET_BITS = 0b01
 const CLEAR_BITS = 0b10
 const PRESERVE_BITS = 0b11
 
-// todo:
+// STREAM_MASK identifies flags that apply to streams.
 const STREAM_MASK = 1
 const FLAG_MASK_IS = STREAM_MASK
 

@@ -38,11 +38,18 @@ type AbstractCollection[E any] struct {
 
 	// GetEleEqualMethod return the func to check elements equals
 	GetEleEqualMethod func() func(x E, other any) bool
+
+	iteratorMethod func() iter.Iterator[E]
+	sizeMethod     func() int
+	addMethod      func(E) bool
 }
 
 // Iterator is abstract method
 func (a *AbstractCollection[E]) Iterator() iter.Iterator[E] {
-	panic("implement me")
+	if a.iteratorMethod == nil {
+		panic("collection: AbstractCollection.Iterator must be implemented by concrete collection")
+	}
+	return a.iteratorMethod()
 }
 
 func (a *AbstractCollection[E]) ForEach(action function.Consumer[E]) {
@@ -53,13 +60,15 @@ func (a *AbstractCollection[E]) ForEach(action function.Consumer[E]) {
 }
 
 func (a *AbstractCollection[E]) Spliterator() iter.Spliterator[E] {
-	//TODO implement me
-	panic("implement me")
+	panic("collection: AbstractCollection.Spliterator is unsupported")
 }
 
 // Size is abstract method
 func (a *AbstractCollection[E]) Size() int {
-	panic("implement me")
+	if a.sizeMethod == nil {
+		panic("collection: AbstractCollection.Size must be implemented by concrete collection")
+	}
+	return a.sizeMethod()
 }
 
 func (a *AbstractCollection[E]) IsEmpty() bool {
@@ -87,7 +96,10 @@ func (a *AbstractCollection[E]) ToArray() []E {
 
 // Add is abstract method
 func (a *AbstractCollection[E]) Add(e E) bool {
-	panic("implement me")
+	if a.addMethod == nil {
+		panic("collection: AbstractCollection.Add must be implemented by concrete collection")
+	}
+	return a.addMethod(e)
 }
 
 // Remove will remove the first element equals o
@@ -99,7 +111,7 @@ func (a *AbstractCollection[E]) Remove(o E) bool {
 			return true
 		}
 	}
-	return true
+	return false
 }
 
 func (a *AbstractCollection[E]) ContainsAll(collection Collection[E]) bool {
@@ -116,7 +128,7 @@ func (a *AbstractCollection[E]) AddAll(collection Collection[E]) bool {
 	modified := false
 	it := collection.Iterator()
 	for it.HasNext() {
-		modified = a.Add(it.Next())
+		modified = a.Add(it.Next()) || modified
 	}
 	return modified
 }
@@ -134,8 +146,15 @@ func (a *AbstractCollection[E]) RemoveAll(collection Collection[E]) bool {
 }
 
 func (a *AbstractCollection[E]) RemoveIf(predicate function.Predicate[E]) bool {
-	//TODO implement me
-	panic("implement me")
+	modified := false
+	it := a.Iterator()
+	for it.HasNext() {
+		if predicate(it.Next()) {
+			it.Remove()
+			modified = true
+		}
+	}
+	return modified
 }
 
 func (a *AbstractCollection[E]) RetainAll(collection Collection[E]) bool {

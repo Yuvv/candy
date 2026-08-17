@@ -10,16 +10,15 @@ type _ReferencePipeline[PIN, POUT any] struct {
 }
 
 func (receiver _ReferencePipeline[EIN, EOUT]) sourceStageSpliterator() iter.Spliterator[EOUT] {
-	// todo
-	return nil
+	panic("stream: sourceStageSpliterator is not implemented")
 }
 
 func (receiver _ReferencePipeline[EIN, EOUT]) forEachOrdered(consumer function.Consumer[EOUT]) {
-	// todo
+	panic("stream: forEachOrdered is not implemented")
 }
 
 func (receiver _ReferencePipeline[EIN, EOUT]) forEach(consumer function.Consumer[EOUT]) {
-	// todo
+	panic("stream: forEach is not implemented")
 }
 
 // -------------------------------- this is a divider ----------------------
