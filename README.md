@@ -2,6 +2,16 @@
 
 Go utility packages for common application code.
 
+## Install
+
+```sh
+go get github.com/yuvv/candy
+```
+
+## Version Status
+
+This module is pre-1.0. APIs may evolve before `v1.0.0`.
+
 ## Packages
 
 - arrays: generic slice filtering, mapping, reducing, chunking, grouping, and deduplication.
@@ -52,4 +62,9 @@ Go 1.18 or newer.
 
 ```sh
 go test ./...
+go vet ./...
 ```
+
+## Release
+
+The first planned release is `v0.1.0`. See `CHANGELOG.md` for release notes.
